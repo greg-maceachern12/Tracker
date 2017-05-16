@@ -8,6 +8,7 @@
 
 import XCTest
 @testable import NewProduct
+@testable import Firebase
 
 class NewProductTests: XCTestCase {
     
