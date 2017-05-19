@@ -13,10 +13,6 @@ import FirebaseStorage
 import FirebaseDatabase
 import SDWebImage
 
-//cant connect tb to normal class. must be tableviewcell class
-
-
-
 class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDelegate, UIPickerViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource {
 
     @IBOutlet weak var lblName: UILabel!
@@ -40,7 +36,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     
     var table1 = false
     var count = 0
-    var posts: [String?] = []
+    var posts:[String?] = ["Add Something!","Add Something!","Add Something!"]
     var posts2:[String?] = []
     
     var imagePicker = UIImagePickerController()
@@ -53,73 +49,14 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        btnPin.layer.cornerRadius = 5
-        btnPin.clipsToBounds = true
         
-        btnBook.layer.cornerRadius = 5
-        btnBook.clipsToBounds = true
-        
-        btnMessage.layer.cornerRadius = 5
-        btnMessage.clipsToBounds = true
-        
-        
-        dataRef.child("users").child(loggedUser!.uid).child("pic").observe(.value){
-            (snap: FIRDataSnapshot) in
-            
-            if let pic = snap.value as? String{
-            self.url = NSURL(string:pic)
-            //print(self.url)
-            }
-        }
-        
-        
-        dataRef.child("users").child(loggedUser!.uid).child("name").observe(.value){
-            (snap: FIRDataSnapshot) in
-            self.lblName.text = snap.value as? String
-        }
-        
-        dataRef.child("users").child(loggedUser!.uid).child("about").observe(.value){
-            (snap: FIRDataSnapshot) in
-            self.tbDescription.text = snap.value as? String
-            
-        }
-        dataRef.child("users").child(loggedUser!.uid).child("Price1").child("0").observe(.value){
-            (snap: FIRDataSnapshot) in
-            
-           self.temp1 = snap.value as? String
-        }
-        dataRef.child("users").child(loggedUser!.uid).child("Price1").child("1").observe(.value){
-            (snap: FIRDataSnapshot) in
-            
-            self.temp2 = snap.value as? String
-        }
-        dataRef.child("users").child(loggedUser!.uid).child("Price1").child("2").observe(.value){
-            (snap: FIRDataSnapshot) in
-            
-            self.temp3 = snap.value as? String
-        }
-        
-        if tbDescription.text == ""{
-            
-            tbDescription.text = "Enter A Detailed Description"
-            tbDescription.textColor = UIColor.lightGray
-            
-        }
-        else{
-            
-        }
-        posts.insert(temp1, at: 0)
-        posts.insert(temp2, at: 1)
-        posts.insert(temp3, at: 2)
+        SetUp()
+        print(posts)
         
         
         // Do any additional setup after loading the view.
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
     
 
     func textViewDidBeginEditing(_ textView: UITextView) {
@@ -135,22 +72,15 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     func textViewDidChange(_ textView: UITextView) {
         self.dataRef.child("users").child(self.loggedUser!.uid).child("about").setValue(tbDescription.text)
         
-//        if count == 0
-//        {
-//            self.dataRef.child("users").child(self.loggedUser!.uid).child("Price1").child("0").setValue(TEMPTb.text!)
-//            
-//        }
-//        else if count == 1
-//        {
-//            self.dataRef.child("users").child(self.loggedUser!.uid).child("Price1").child("1").setValue(TEMPTb.text!)
-//        }
-//        else if count == 2
-//        {
-//           self.dataRef.child("users").child(self.loggedUser!.uid).child("Price1").child("2").setValue(TEMPTb.text!)
-//        }
     }
     
     
+    ////////////////////////////////////////////////////////////////////////////////
+    
+    
+    
+    
+                            //PICKER VIEW FUNCTIONS
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
@@ -173,6 +103,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
         
+        //declaring the things which will be in the pickerview
         let myView = UIView(frame: CGRect(x: 0, y: 0, width: pickerView.bounds.width, height: 120))
         let myImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: pickerView.bounds.width, height: 120))
         let Loader = UIActivityIndicatorView(frame: CGRect(x: 168, y: 60, width: 40, height: 40))
@@ -187,7 +118,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     
 
 
-            //initializing the rows data
+            //initializing the picker rows data
         switch row {
         case 0:
             
@@ -320,6 +251,9 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         return myView
     }
     
+    
+    
+    //method for setting an image and saving it
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         
       
@@ -341,6 +275,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
             
         }
         
+        //very important. This keeps track of which row was clicked to have the image uploaded. Overall, using the pickercontroller was inefficient and was very slow. Might change
        
             if (tracker == 0)
             {
@@ -367,9 +302,10 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     
     }
     
-
+    
     @IBAction func longPressPicker(_ sender: UILongPressGestureRecognizer) {
         
+        // this is for whena  row is long pressed to change the image
         let picker = UIImagePickerController()
         picker.delegate = self
         picker.allowsEditing = true
@@ -416,6 +352,9 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         dismiss(animated: true, completion: nil)
     }
     
+    
+    
+                                //Uploading Images
     func UploadImage(){
         
         let imageName =  NSUUID().uuidString
@@ -456,41 +395,198 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         
     }
     
-
+    
+    ///////////////////////////////////////////////////////////////////////////////////////
+    
+    
+    
+                    //TABLE FUNCTIONS
     
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 3
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        count = indexPath.row
-        enableCustomMenu()
+        //count = indexPath.row
+       // print(count)
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
+        //sets the label in the cell to be data from the array "posts" which is a string of values grabbed from the database
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")
-        
-//        if table1 == false
-//        {
-//        
-//        TEMPTb.text = "\(posts[indexPath.row]!)"
-//        }
-//        else{
-////            let label1 = cell?.viewWithTag(1) as! UILabel
-////            label1.text = "\(posts[indexPath.row]!)"
-//        }
+ 
+        let tb1 = cell?.viewWithTag(1) as! UITextView
+        print(posts)
+        print(indexPath.row)
+        tb1.text = posts[indexPath.row]!
         
         return cell!
-    }
-    
-    func enableCustomMenu() {
-        let lookup = UIMenuItem(title: "Edit", action: #selector(EditData))
-        UIMenuController.shared.menuItems = [lookup]
-    }
-    func EditData() {
-//        TEMPTb.isEditable = true
-//        TEMPTb.text = "Enter a description"
+        
         
     }
+    
+    
+    
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        
+        return true
+    }
+    
+
+    func tableView(_ tableView: UITableView, editActionsForRowAt: IndexPath) -> [UITableViewRowAction]? {
+    
+        //swipe to edit feature
+        
+        
+        let edit = UITableViewRowAction(style: .normal, title: "Edit") { action, index in
+            //What happens when Edit button is tapped
+            self.count = index.row
+            print(self.count)
+    
+            let alertController = UIAlertController(title: "Edit", message: "", preferredStyle: .alert)
+            
+            let saveAction = UIAlertAction(title: "Save", style: .default, handler: {
+                alert -> Void in
+                
+                let firstTextField = alertController.textFields![0] as UITextField
+                
+                if firstTextField.text == ""
+                {
+                    
+                }
+                else
+                {
+                    //print("firstName \(firstTextField.text)")
+                if self.count == 0
+                {
+                    self.dataRef.child("users").child(self.loggedUser!.uid).child("Price1").child("Price1_0").setValue(firstTextField.text)
+                    }
+                else if self.count == 1
+                    {
+                        self.dataRef.child("users").child(self.loggedUser!.uid).child("Price1").child("Price1_1").setValue(firstTextField.text)
+                    }
+                 else if self.count == 2
+                    {
+                        self.dataRef.child("users").child(self.loggedUser!.uid).child("Price1").child("Price1_2").setValue(firstTextField.text)
+                    }
+                }
+                
+                
+            })
+            
+            let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: {
+                (action : UIAlertAction!) -> Void in
+                
+                
+            })
+            
+            alertController.addTextField { (textField : UITextField!) -> Void in
+                textField.placeholder = "Describe this pricing"
+            }
+            
+            alertController.addAction(saveAction)
+            alertController.addAction(cancelAction)
+            
+            self.present(alertController, animated: true, completion: nil)
+        
+
+            
+            
+        }
+        edit.backgroundColor = .blue
+        
+        return [edit]
+    }
+    
+    
+    
+    
+    
+    
+    
+    func SetUp(){
+       
+        
+        btnPin.layer.cornerRadius = 5
+        btnPin.clipsToBounds = true
+        
+        btnBook.layer.cornerRadius = 5
+        btnBook.clipsToBounds = true
+        
+        btnMessage.layer.cornerRadius = 5
+        btnMessage.clipsToBounds = true
+        
+        
+        dataRef.child("users").child(loggedUser!.uid).child("pic").observe(.value){
+            (snap: FIRDataSnapshot) in
+            
+            if let pic = snap.value as? String{
+                self.url = NSURL(string:pic)
+                //print(self.url)
+            }
+        }
+        
+        
+        dataRef.child("users").child(loggedUser!.uid).child("name").observe(.value){
+            (snap: FIRDataSnapshot) in
+            self.lblName.text = snap.value as? String
+        }
+        
+        dataRef.child("users").child(loggedUser!.uid).child("about").observe(.value){
+            (snap: FIRDataSnapshot) in
+            self.tbDescription.text = snap.value as? String
+            
+        }
+        
+        if tbDescription.text == ""{
+            
+            tbDescription.text = "Enter A Detailed Description"
+            tbDescription.textColor = UIColor.lightGray
+            
+        }
+        dataRef.child("users").child(loggedUser!.uid).child("Price1").child("Price1_0").observe(.value){
+            (snap: FIRDataSnapshot) in
+            self.temp1 = snap.value as? String
+            if self.temp1 != nil
+            {
+                self.posts[0] = self.temp1!
+                self.tableView1.reloadData()
+            }
+            else{
+            
+            }
+        }
+        dataRef.child("users").child(loggedUser!.uid).child("Price1").child("Price1_1").observe(.value){
+            (snap: FIRDataSnapshot) in
+            self.temp2 = snap.value as? String
+            if self.temp2 != nil
+            {
+            self.posts[1] = self.temp2!
+            self.tableView1.reloadData()
+            }
+            else
+            {
+                
+            }
+        }
+        dataRef.child("users").child(loggedUser!.uid).child("Price1").child("Price1_2").observe(.value){
+            (snap: FIRDataSnapshot) in
+            self.temp3 = snap.value as? String
+            if self.temp3 != nil
+            {
+            self.posts[2] = self.temp3!
+            self.tableView1.reloadData()
+            }
+            else{
+                
+            }
+            
+        }
+        
+        print(posts)
+
+    }
+    
+    
     
 }

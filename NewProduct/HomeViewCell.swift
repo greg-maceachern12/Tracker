@@ -21,9 +21,8 @@ import FirebaseStorage
 
     @IBOutlet weak var Loader: UIActivityIndicatorView!
     @IBOutlet weak var imgMain: UIImageView!
-   // @IBOutlet weak var lblTitle: UILabel!
-   // @IBOutlet weak var tbDescript: UITextView!
-  //  @IBOutlet weak var lblDate: UILabel!
+    
+    //Only thing this whole thing does is let me customize the image in the cell and add an activity moniter
 
     override func awakeFromNib() {
         super.awakeFromNib()

@@ -23,7 +23,6 @@ class NewPostViewController: UIViewController,UITextFieldDelegate,UITextViewDele
     
     
     @IBOutlet weak var tbTitle: UITextField!
-   //@IBOutlet weak var tbDescription: UITextView!
     @IBOutlet weak var tbPrice: UITextField!
     @IBOutlet weak var Date: UIDatePicker!
     @IBOutlet weak var btnPost: UIButton!
@@ -35,20 +34,10 @@ class NewPostViewController: UIViewController,UITextFieldDelegate,UITextViewDele
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        tbDescription.text = "Enter A Detailed Description"
-//        tbDescription.textColor = UIColor.lightGray
         btnPost.layer.cornerRadius = 7
-        
-        
-
-        // Do any additional setup after loading the view.
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
+    //function to remove placeholder text
     func textViewDidBeginEditing(_ textView: UITextView) {
         
 //        if (tbDescription.textColor == UIColor.lightGray || tbDescription.text == "Enter A Detailed Description")
@@ -63,6 +52,7 @@ class NewPostViewController: UIViewController,UITextFieldDelegate,UITextViewDele
         dismiss(animated: true, completion: nil)
     }
 
+            //dismisses the keyboard
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.view.endEditing(true)
     }
@@ -79,20 +69,10 @@ class NewPostViewController: UIViewController,UITextFieldDelegate,UITextViewDele
     //code for posting
     @IBAction func didPost(_ sender: Any) {
         
-        //format for making date appear as dd/mm/yy
-        
-        
-       // self.dataRef.child("users").child(self.loggedUser!.uid).child("posts").child("Title").setValue(tbTitle.text)
-       // self.dataRef.child("users").child(self.loggedUser!.uid).child("posts").child("Description").setValue(tbDescription.text)
-        //self.dataRef.child("users").child(self.loggedUser!.uid).child("posts").child("Time").setValue(tbTitle.text)
-        
-        
+        //If there is text in both boxes
         if (tbPrice.text!.characters.count > 0 && tbTitle.text != "")
         {
-
-              //let imageName =  NSUUID().uuidString
-            //let storedImage = storageRef.child("imgMain").child(imageName)
-            
+ 
             dataRef.child("users").child(loggedUser!.uid).observeSingleEvent(of: .value, with: {  (snapshot) in
                 
                 
@@ -140,9 +120,8 @@ class NewPostViewController: UIViewController,UITextFieldDelegate,UITextViewDele
             })
             
             
-           
-            //print(img)
             
+            //if the text boxes are blank, show the error
         }
         else
         {

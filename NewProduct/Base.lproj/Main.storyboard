@@ -699,18 +699,18 @@
                                                     <rect key="frame" x="0.0" y="0.0" width="260" height="99.5"/>
                                                     <autoresizingMask key="autoresizingMask"/>
                                                     <subviews>
-                                                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" tag="1" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" text="Lorem ipsum dolor sit er elit lamet, consectetaur cillium " textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="uM0-HM-1xD">
-                                                            <rect key="frame" x="0.0" y="8" width="252" height="84"/>
+                                                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" tag="1" contentMode="scaleToFill" editable="NO" text="Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et " textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="R3z-G8-15o">
+                                                            <rect key="frame" x="8" y="8" width="244" height="84"/>
                                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                             <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                                         </textView>
                                                     </subviews>
                                                     <constraints>
-                                                        <constraint firstItem="uM0-HM-1xD" firstAttribute="leading" secondItem="zos-fH-g2Q" secondAttribute="leading" id="JbZ-PT-F1v"/>
-                                                        <constraint firstItem="uM0-HM-1xD" firstAttribute="top" secondItem="zos-fH-g2Q" secondAttribute="topMargin" id="Q3Q-A5-2EF"/>
-                                                        <constraint firstItem="uM0-HM-1xD" firstAttribute="trailing" secondItem="zos-fH-g2Q" secondAttribute="trailingMargin" id="kBf-bL-fcl"/>
-                                                        <constraint firstItem="uM0-HM-1xD" firstAttribute="centerY" secondItem="zos-fH-g2Q" secondAttribute="centerY" id="o0B-Kj-Gf0"/>
+                                                        <constraint firstItem="R3z-G8-15o" firstAttribute="trailing" secondItem="zos-fH-g2Q" secondAttribute="trailingMargin" id="OrP-zd-cCc"/>
+                                                        <constraint firstItem="R3z-G8-15o" firstAttribute="top" secondItem="zos-fH-g2Q" secondAttribute="topMargin" id="Q4V-sU-OT4"/>
+                                                        <constraint firstItem="R3z-G8-15o" firstAttribute="centerY" secondItem="zos-fH-g2Q" secondAttribute="centerY" id="fnx-XF-Ohi"/>
+                                                        <constraint firstItem="R3z-G8-15o" firstAttribute="leading" secondItem="zos-fH-g2Q" secondAttribute="leadingMargin" id="xVF-hd-6xP"/>
                                                     </constraints>
                                                 </tableViewCellContentView>
                                                 <gestureRecognizers/>

@@ -6,6 +6,8 @@
 //  Copyright © 2017 Greg MacEachern. All rights reserved.
 //
 
+                                            //CODE FOR MAIN PROFILE
+
 import UIKit
 import Firebase
 import FirebaseAuth
@@ -18,7 +20,6 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
     @IBOutlet weak var imgMain: UIImageView!
     @IBOutlet weak var Logout: UIButton!
     @IBOutlet weak var Loader: UIActivityIndicatorView!
-    //@IBOutlet weak var imgCover: UIImageView!
     @IBOutlet var tap: UITapGestureRecognizer!
     @IBOutlet var longpress: UILongPressGestureRecognizer!
     @IBOutlet weak var btnSave: UIButton!
@@ -40,6 +41,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
     
     var upload = false
     
+    //giving these values of nothing
     var loc = ""
     var birth = ""
     var gend = ""
@@ -47,24 +49,19 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
     
     
     var imagePicker = UIImagePickerController()
-    //var coverPicker = UIImagePickerController()
     
     var state = false
     
     let user = FIRAuth.auth()?.currentUser
     
+    //I was being lazy and made variables for these references
    let NameLoad = FIRDatabase.database().reference().child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("name")
     let aboutLoad = FIRDatabase.database().reference().child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("about")
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
-      //  tabbaritem.image = [[UIImage imageNamed:@“image”] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
-        
         lblName.isUserInteractionEnabled = true
-        
-        
         btnSave.layer.mask?.cornerRadius = 5
         
         
@@ -80,12 +77,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         setupProfile()
         
         
-        
-        
-        
         //allow the profile pic to be clicked
         self.imgMain.isUserInteractionEnabled = true
-        //self.imgCover.isUserInteractionEnabled = true
        
     }
     
@@ -96,20 +89,17 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
        // saveChange()
         
         
+        
+        //"upload" is if the image has been changed. If not (false), then the image isn't reuploaded which saves data, memory and database storage
+        
         if upload == true{
             saveChange()
             self.NameRef.child("users").child(self.user!.uid).child("name").setValue(lblName.text)
-           // self.NameRef.child("users").child(self.user!.uid).child("about").setValue(tbAbout.text)
-//            
-//            self.NameRef.child("users").child(self.user!.uid).child("location").setValue(lblLoc.text)
-//            self.NameRef.child("users").child(self.user!.uid).child("birthday").setValue(lblBirth.text)
-//            self.NameRef.child("users").child(self.user!.uid).child("gender").setValue(lblGend.text)
-//            self.NameRef.child("users").child(self.user!.uid).child("ID").setValue(lblID.text)
+
             upload = false
         }
         else{
             self.NameRef.child("users").child(self.user!.uid).child("name").setValue(lblName.text)
-            //self.NameRef.child("users").child(self.user!.uid).child("about").setValue(tbAbout.text)
             btnSave.isHidden=true
             
             self.NameRef.child("users").child(self.user!.uid).child("location").setValue(loc)
@@ -122,16 +112,17 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
     }
     
 
-    //when logout is clicked
+    //when logout button is clicked (will be moved or put somewhere else. Temporary)
     @IBAction func LogoutAct(_ sender: Any) {
         
        setupProfile()
         try! FIRAuth.auth()?.signOut()
-        
         LogoutSeq()
     }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
-    //loading image from database into view
+                                                    //SETTING UP THE PROFILE
     func setupProfile(){
     
         imgMain.layer.cornerRadius = 4
@@ -139,18 +130,15 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         
         btnSave.layer.cornerRadius = 5
         btnSave.clipsToBounds = true
+
+        self.Loader.startAnimating()
         
         
-      self.Loader.startAnimating()
-            
+        //loading image from database into view. Found this online. Not as efficient as I would have liked but it works
             let uid = FIRAuth.auth()?.currentUser?.uid
             NameRef.child("users").child(uid!).observeSingleEvent(of: .value, with: {  (snapshot) in
-                
-                
                 if let dict = snapshot.value as? [String: AnyObject]
                 {
-                    
-                //self.lblName.text = dict["username"] as? String
                     
                 if let profileImageURL = dict["pic"] as? String
                 {
@@ -178,26 +166,14 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
                         
                     }).resume()
                     
-                    
-                    //cover
-//                    if let coverImageURL = dict["cover"] as? String
-//                    {
-//                        let url2 = URL(string: coverImageURL)
-//                        URLSession.shared.dataTask(with: url2!, completionHandler: { (data2, response, error) in
-//                            if error != nil{
-//                                print(error!)
-//                                return
-//                            }
-//                            DispatchQueue.main.async {
-//                                self.imgCover?.image = UIImage(data: data2!)
-//                                self.Loader.stopAnimating()
-//                            }
-//                            
-//                        }).resume()
                     }
                 }
         })
         
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        
+        
+                                            //Loading all the default value
         NameLoad.observe(.value){
             (snap: FIRDataSnapshot) in
             self.lblName.text = snap.value as? String
@@ -236,15 +212,15 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         }
     
 }
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    
     //image picker
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         
         btnSave.isHidden = false
-        
-//        
-//        if state == false
-//        {
+
+        //Seeting the image equal to the profile picture. If the image was edited (cropped) it will upload that instead
         var selectedImage:UIImage?
         
         
@@ -264,33 +240,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             
             
         }
-        //saveChange()
         dismiss(animated: true, completion: nil)
-        //}
-        
-//        if state == true
-//        {
-//            var selectedCover:UIImage?
-//            
-//            
-//            if let editedCover = info["UIImagePickerControllerEditedImage"] as? UIImage
-//            {
-//                selectedCover = editedCover
-//            }
-//            else if let originalCover = info["UIImagePickerControllerOriginalImage"] as? UIImage
-//            {
-//                selectedCover = originalCover
-//            }
-//            
-//            if let selectedCover2 = selectedCover
-//            {
-//                imgCover.image = selectedCover2
-//                upload = true
-//                
-//            }
-//            dismiss(animated: true, completion: nil)
-//        }
-        
     }
     
     
@@ -300,17 +250,18 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         dismiss(animated: true, completion: nil)
     }
    
-    //saving changes
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    
+                                                    //SAVING CHANGES
     func saveChange(){
         
         Loader.startAnimating()
         let imageName =  NSUUID().uuidString
-        //let imageNameCover = NSUUID().uuidString
-        
         let storedImage = storageRef.child("imgMain").child(imageName)
-        //let storedCover = storageRef.child("imgCover").child(imageNameCover)
-      
         
+        
+        //also found this online
         if let uploadData = UIImagePNGRepresentation(self.imgMain.image!)
         {
             storedImage.put(uploadData, metadata: nil, completion: { ( metadata, error) in
@@ -339,36 +290,6 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
                     })
                 })
             }
-        
-        
-        
-//        if let uploadDataCover = UIImagePNGRepresentation(self.imgCover.image!)
-//        {
-//            storedCover.put(uploadDataCover, metadata: nil, completion: { ( metadata, error) in
-//                if error != nil
-//                {
-//                    print(error!)
-//                    return
-//                }
-//                storedCover.downloadURL(completion: { (url,error) in
-//                    if error != nil
-//                    {
-//                        print(error!)
-//                        return
-//                    }
-//                    if let urlText2 = url?.absoluteString{
-//                        self.NameRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).updateChildValues(["cover" : urlText2], withCompletionBlock: { (error,ref) in
-//                            if error != nil
-//                            {
-//                                print(error!)
-//                                return
-//                            }
-//                            self.Loader.stopAnimating()
-//                        })
-//                    }
-//                })
-//            })
-//        }
     }
 
 //what happens when logout is clicked
@@ -379,10 +300,12 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         
         }
     
-    //Tap Gesture for profile picture
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    //When user taps profile picture
     @IBAction func Tapped(_ sender: UITapGestureRecognizer) {
         
-        
+        //this method opens a little menu at the bottom with the options; View Picture, Photos and Camera
         let picker = UIImagePickerController()
         picker.delegate = self
         picker.allowsEditing = true
@@ -391,7 +314,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         let myActionSheet = UIAlertController(title: "Profile Picture", message: "Select", preferredStyle: UIAlertControllerStyle.actionSheet)
         
         let viewPicture = UIAlertAction(title: "View Picture", style: UIAlertActionStyle.default) { (action) in
-            
+            //Put code for what happens when the button is clicked
             let imageView = sender.view as! UIImageView
             let newImageView = UIImageView(image: imageView.image)
             
@@ -403,8 +326,6 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             
             newImageView.isUserInteractionEnabled = true
             
-            
-            
             let tap = UITapGestureRecognizer(target:self,action:#selector(self.dismissFullScreenImage))
             
             newImageView.addGestureRecognizer(tap)
@@ -415,6 +336,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         let photoGallery = UIAlertAction(title: "Photos", style: UIAlertActionStyle.default) { (action) in
             if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.savedPhotosAlbum)
             {
+                
+                //Not sure why i have to set the imagepickers delegate to self. Thats the only way it worked tho
                 self.imagePicker.delegate = self
                 self.imagePicker.sourceType = UIImagePickerControllerSourceType.savedPhotosAlbum
                 self.imagePicker.allowsEditing = true
@@ -427,18 +350,14 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         let camera = UIAlertAction(title: "Camera", style: UIAlertActionStyle.default) { (action) in
             if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera)
             {
+                
+                //This was a pain in the ass to get to work. In the in GoogleService-Info.plist you HAVE to add the camera permission (for future projects obvi)
                 self.imagePicker.delegate = self
                 self.imagePicker.sourceType = UIImagePickerControllerSourceType.camera
                 self.imagePicker.allowsEditing = true
                 self.state = false
                 self.present(self.imagePicker, animated: true, completion: nil)
                 
-                
-//                self.imagePicker.allowsEditing = false
-//                self.imagePicker.sourceType = UIImagePickerControllerSourceType.camera
-//                self.imagePicker.cameraCaptureMode = .photo
-//                self.imagePicker.modalPresentationStyle = .fullScreen
-//                self.present(self.imagePicker, animated: true, completion: nil)
             }
         }
         
@@ -451,82 +370,23 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         self.present(myActionSheet, animated: true, completion: nil)
     }
     
-    
+    // This func just dismisses the view when the user tappen "View Picture"
     func dismissFullScreenImage(_sender:UITapGestureRecognizer){
         _sender.view?.removeFromSuperview()
     }
     
-    func dismissFullScreenCover(_sender:UITapGestureRecognizer){
-        _sender.view?.removeFromSuperview()
-    }
     
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
 
-        //long press for cover photo
+                        //long press for cover photo (Not being used)
     @IBAction func LongPress(_ sender: UILongPressGestureRecognizer) {
-//        
-//        let picker2 = UIImagePickerController()
-//        picker2.delegate = self
-//        picker2.allowsEditing = true
-//        picker2.sourceType = UIImagePickerControllerSourceType.photoLibrary
-//        
-//        let myActionSheet = UIAlertController(title: "Cover Photo", message: "Select long and short photos for best results", preferredStyle: UIAlertControllerStyle.actionSheet)
-//        
-//        let viewPicture = UIAlertAction(title: "View Picture", style: UIAlertActionStyle.default) { (action) in
-//            
-//            let imageView = sender.view as! UIImageView
-//            let newImageView = UIImageView(image: imageView.image)
-//            
-//            
-//            newImageView.frame = self.view.frame
-//            
-//            newImageView.backgroundColor = UIColor.black
-//            newImageView.contentMode = .scaleAspectFit
-//            
-//            newImageView.isUserInteractionEnabled = true
-//            
-//            let tap2 = UILongPressGestureRecognizer(target:self,action:#selector(self.dismissFullScreenCover))
-//            
-//            newImageView.addGestureRecognizer(tap2)
-//            self.view.addSubview(newImageView)
-//            
-       }
-        
-//        let photoGallery = UIAlertAction(title: "Photos", style: UIAlertActionStyle.default) { (action) in
-//            if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.savedPhotosAlbum)
-//            {
-//                self.imagePicker.delegate = self
-//                self.imagePicker.sourceType = UIImagePickerControllerSourceType.savedPhotosAlbum
-//                self.imagePicker.allowsEditing = true
-//                self.state = true
-//               self.present(self.imagePicker, animated: true, completion: nil)
-//                
-//            }
-//        }
-//        
-//        let camera = UIAlertAction(title: "Camera", style: UIAlertActionStyle.default) { (action) in
-//            if UIImagePickerController.isSourceTypeAvailable(UIImagePickerControllerSourceType.camera)
-//            {
-//                self.imagePicker.delegate = self
-//                self.imagePicker.sourceType = UIImagePickerControllerSourceType.camera
-//                self.imagePicker.allowsEditing = true
-//                self.state = true
-//                self.present(self.imagePicker, animated: true, completion: nil)
-//            }
-//        }
-//        
-//        
-//        myActionSheet.addAction(viewPicture)
-//        myActionSheet.addAction(photoGallery)
-//        myActionSheet.addAction(camera)
-//        myActionSheet.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel, handler: nil))
-//        
-//        self.present(myActionSheet, animated: true, completion: nil)
-//
-//    }
+}
 
     @IBAction func longPressLabel(_ sender: UILongPressGestureRecognizer) {
+        //When the label with the name stored in it is long pressed, this occurs
         
+        //Allows me to edit the name in the database. I don't like the look of it but it will suffice for now
         let alertController = UIAlertController(title: "Edit Name", message: "", preferredStyle: .alert)
         
         let saveAction = UIAlertAction(title: "Save", style: .default, handler: {
@@ -577,8 +437,11 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         btnSave.isHidden = false
     }
     
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
     @IBAction func editClick(_ sender: Any) {
         
+       // This brings up the dialogue for changing the about field
         let alertController = UIAlertController(title: "Edit Information", message: "", preferredStyle: .alert)
         
         let saveAction = UIAlertAction(title: "Save", style: .default, handler: {
@@ -648,10 +511,6 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
                 self.btnSave.isHidden = false
                 }
             }
-           
-            
-            
-            
             
         })
         
@@ -714,7 +573,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         
     }
    
-    
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     
 }
