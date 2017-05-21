@@ -237,6 +237,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         {
             imgMain.image = selectedImage2
             upload = true
+            Loader.stopAnimating()
             
             
         }
@@ -447,11 +448,13 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         let saveAction = UIAlertAction(title: "Save", style: .default, handler: {
             alert -> Void in
             
+            
             let firstTextField = alertController.textFields![0] as UITextField
+             firstTextField.placeholder = "Please enter a location (City/State/Country)"
             
             if firstTextField.text == ""
             {
-                firstTextField.placeholder = "Please enter a location (City/State/Country)"
+               
             }
             else
             {

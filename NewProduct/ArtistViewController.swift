@@ -21,7 +21,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     @IBOutlet weak var btnMessage: UIButton!
     @IBOutlet weak var btnPin: UIButton!
     @IBOutlet weak var btnBook: UIButton!
-    @IBOutlet weak var ugh: UIImageView!
+   // @IBOutlet weak var ugh: UIImageView!
     @IBOutlet weak var tableView1: UITableView!
     @IBOutlet weak var tableView2: UITableView!
     
@@ -29,6 +29,8 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     var dataRef = FIRDatabase.database().reference()
     var storageRef = FIRStorage.storage().reference()
     var loggedUser = FIRAuth.auth()?.currentUser
+    
+    var Loader: UIActivityIndicatorView!
     
     var tracker: Int! = 0
     
@@ -41,7 +43,12 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     
     var imagePicker = UIImagePickerController()
     var url: NSURL!
-    var tempImg: UIImageView!
+    var tempImg = UIImageView()
+    
+    var placeholderLabel: UILabel!
+    var tempImg1 = UIImageView()
+    var tempImg2 = UIImageView()
+    var tempImg3 = UIImageView()
     
     var temp1: String!
     var temp2: String!
@@ -50,15 +57,31 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        SetUp()
-        print(posts)
         
+        
+        tbDescription.delegate = self
+        placeholderLabel = UILabel()
+        placeholderLabel.lineBreakMode = NSLineBreakMode.byWordWrapping
+        placeholderLabel.numberOfLines = 4
+        placeholderLabel.text = "Give your clients some information about yourself \n Eg. Where you're from \n Eg. The equipment you use \n Eg. Links to websites/other portals"
+        placeholderLabel.font = UIFont(name: "Avenir Next", size: 14)
+        placeholderLabel.sizeToFit()
+        tbDescription.addSubview(placeholderLabel)
+        placeholderLabel.frame.origin = CGPoint(x: 5, y: (tbDescription.font?.pointSize)!/2)
+        placeholderLabel.textColor = UIColor.lightGray
+        placeholderLabel.isHidden = !tbDescription.text.isEmpty
+        
+        SetUp()
+        SetPic()
+        print(posts)
         
         // Do any additional setup after loading the view.
     }
 
     
-
+    func textViewDidChangeSelection(_ textView: UITextView) {
+        placeholderLabel.isHidden = !tbDescription.text.isEmpty
+    }
     func textViewDidBeginEditing(_ textView: UITextView) {
         
                 if (tbDescription.textColor == UIColor.lightGray || tbDescription.text == "Enter A Detailed Description")
@@ -76,7 +99,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     
     
     ////////////////////////////////////////////////////////////////////////////////
-    
+
     
     
     
@@ -96,6 +119,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         tracker = row
         print(tracker)
+        
     }
     
     
@@ -106,138 +130,44 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         //declaring the things which will be in the pickerview
         let myView = UIView(frame: CGRect(x: 0, y: 0, width: pickerView.bounds.width, height: 120))
         let myImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: pickerView.bounds.width, height: 120))
-        let Loader = UIActivityIndicatorView(frame: CGRect(x: 168, y: 60, width: 40, height: 40))
+        Loader = UIActivityIndicatorView(frame: CGRect(x: pickerView.frame.width/2, y: 60, width: 40, height: 40))
         let myLabel = UILabel(frame: CGRect(x: 0, y: 0, width: pickerView.frame.width, height: 120))
         myLabel.textAlignment = NSTextAlignment.center
         myLabel.backgroundColor = UIColor.clear
         var rowString = String()
-        rowString = "Upload a Picture"
+        rowString = "Upload a Picture (By LongPressing)"
         
-        Loader.color = UIColor.orange
-        Loader.startAnimating()
+        Loader.color = UIColor.white
     
-
+    
+        
 
             //initializing the picker rows data
         switch row {
         case 0:
             
-            dataRef.child("users").child(loggedUser!.uid).observeSingleEvent(of: .value, with: {  (snapshot) in
-                
-                if let dict = snapshot.value as? [String: AnyObject]
-                {
-                  
-                    
-                    if let profileImageURL = dict["ProfilePic1"] as? String
-                    {
-                        
-                        let url = URL(string: profileImageURL)
-                        URLSession.shared.dataTask(with: url!, completionHandler: { (data, response, error) in
-                            if error != nil{
-                                print(error!)
-                                return
-                            }
-                            DispatchQueue.main.async {
-                                print(data!)
-                                if data == nil
-                                {
-                                    rowString = "Upload an Image 1"
-                               
-                                }
-                                else
-                                {
-                                    myImageView.image = UIImage(data: data!)
-                                    Loader.stopAnimating()
-                                    rowString = ""
-                                }
-                                
-                                
-                            }
-                        }).resume()
-                    }
-                }
-            })
+            myImageView.image = tempImg1.image
             
+           
+         
+            
+            
+           
+            
+           
+            
+            //
         case 1:
-    
-            dataRef.child("users").child(loggedUser!.uid).observeSingleEvent(of: .value, with: {  (snapshot) in
-                
-                if let dict = snapshot.value as? [String: AnyObject]
-                {
-                    
-                    //self.lblName.text = dict["username"] as? String
-                    
-                    if let profileImageURL = dict["ProfilePic2"] as? String
-                    {
-                        
-                        let url = URL(string: profileImageURL)
-                        URLSession.shared.dataTask(with: url!, completionHandler: { (data, response, error) in
-                            if error != nil{
-                                print(error!)
-                                return
-                            }
-                            DispatchQueue.main.async {
-                                
-                                if data == nil
-                                {
-                                    rowString = "Upload an image1"
-                                   // myImageView.image = UIImage(named: "City")
-                                }
-                                else
-                                {
-                                    myImageView.image = UIImage(data: data!)
-                                
-                                    rowString = ""
-                                    Loader.stopAnimating()
-                                }
-                                
-                                
-                            }
-                        }).resume()
-                    }
-                }
-            })
+            
+            myImageView.image = tempImg2.image
+           
+
         case 2:
+           
+            myImageView.image = tempImg3.image
             
-            dataRef.child("users").child(loggedUser!.uid).observeSingleEvent(of: .value, with: {  (snapshot) in
-                
-                if let dict = snapshot.value as? [String: AnyObject]
-                {
-                    
-                   
-                    
-                    if let profileImageURL = dict["ProfilePic3"] as? String
-                    {
-                        
-                        let url = URL(string: profileImageURL)
-                        URLSession.shared.dataTask(with: url!, completionHandler: { (data, response, error) in
-                            if error != nil{
-                                print(error!)
-                                return
-                            }
-                            DispatchQueue.main.async {
-                                
-                                if data == nil
-                                {
-                                    rowString = "Upload an image1"
-                                    myImageView.image = UIImage(named: "City")
-                                }
-                                else
-                                {
-                                    myImageView.image = UIImage(data: data!)
-                                    
-                                    Loader.stopAnimating()
-                                    rowString = ""
-                                }
-                                
-                                
-                            }
-                        }).resume()
-                    }
-                }
-            })
+
         
-            
         case 3: break
         default:
             rowString = "Error: too many rows"
@@ -271,7 +201,8 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         
         if let selectedImage2 = selectedImage
         {
-            ugh.image = selectedImage2 as UIImage
+            //ugh.image = selectedImage2 as UIImage
+            tempImg.image = selectedImage2 as UIImage
             
         }
         
@@ -281,18 +212,23 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
             {
                 status = "ProfilePic1"
                 
+                tempImg1.image = tempImg.image
+                
+                
                 UploadImage()
             }
                 
             else if (tracker == 1)
             {
                 status = "ProfilePic2"
+                tempImg2.image = tempImg.image
                 
                 UploadImage()
             }
             else if tracker == 2
             {
                 status = "ProfilePic3"
+                tempImg3.image = tempImg.image
                 
                 UploadImage()
             }
@@ -364,7 +300,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
 
         
         
-        if let uploadData = UIImagePNGRepresentation(self.ugh.image!)
+        if let uploadData = UIImagePNGRepresentation(self.tempImg.image!)
         {
                 storedImage.put(uploadData, metadata: nil, completion: { ( metadata, error) in
                     if error != nil
@@ -382,6 +318,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
                             self.dataRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).updateChildValues(["\(self.status!)" : urlText], withCompletionBlock: { (error,ref) in
                                 if error != nil
                                 {
+                                    
                                     print(error!)
                                     return
                                 }
@@ -410,11 +347,16 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         //count = indexPath.row
        // print(count)
     }
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 100
+    }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         //sets the label in the cell to be data from the array "posts" which is a string of values grabbed from the database
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")
- 
+        
+
+        
         let tb1 = cell?.viewWithTag(1) as! UITextView
         print(posts)
         print(indexPath.row)
@@ -583,8 +525,128 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
             
         }
         
+
+        
         print(posts)
 
+    }
+    func SetPic()
+    {
+       
+                   dataRef.child("users").child(loggedUser!.uid).observeSingleEvent(of: .value, with: {  (snapshot) in
+                
+                if let dict = snapshot.value as? [String: AnyObject]
+                {
+                    
+                    
+                    if let profileImageURL = dict["ProfilePic1"] as? String
+                    {
+                        
+                        let url = URL(string: profileImageURL)
+                        URLSession.shared.dataTask(with: url!, completionHandler: { (data, response, error) in
+                            if error != nil{
+                                print(error!)
+                                return
+                            }
+                            DispatchQueue.main.async {
+                                print(data!)
+                                if data == nil
+                                {
+                                    print("nil")
+                                    
+                                }
+                                else
+                                {
+                                    self.tempImg1.image = UIImage(data: data!)
+                                    
+                                }
+                                
+                                
+                            }
+                        }).resume()
+                    }
+                }
+            
+            })
+            
+     
+            dataRef.child("users").child(loggedUser!.uid).observeSingleEvent(of: .value, with: {  (snapshot) in
+                
+                if let dict = snapshot.value as? [String: AnyObject]
+                {
+                    
+                    
+                    if let profileImageURL = dict["ProfilePic2"] as? String
+                    {
+                        
+                        let url = URL(string: profileImageURL)
+                        URLSession.shared.dataTask(with: url!, completionHandler: { (data, response, error) in
+                            if error != nil{
+                                print(error!)
+                                return
+                            }
+                            DispatchQueue.main.async {
+                                print(data!)
+                                if data == nil
+                                {
+                                    print("nil")
+                                    
+                                }
+                                else
+                                {
+                                    self.tempImg2.image = UIImage(data: data!)
+                                  
+                                }
+                                
+                                
+                            }
+                        }).resume()
+                    }
+                }
+                
+            })
+            
+       
+        
+       
+            dataRef.child("users").child(loggedUser!.uid).observeSingleEvent(of: .value, with: {  (snapshot) in
+                
+                if let dict = snapshot.value as? [String: AnyObject]
+                {
+                    
+                    
+                    if let profileImageURL = dict["ProfilePic3"] as? String
+                    {
+                        
+                        let url = URL(string: profileImageURL)
+                        URLSession.shared.dataTask(with: url!, completionHandler: { (data, response, error) in
+                            if error != nil{
+                                print(error!)
+                                return
+                            }
+                            DispatchQueue.main.async {
+                                print(data!)
+                                if data == nil
+                                {
+                                    print("nil")
+                                    
+                                }
+                                else
+                                {
+                                    self.tempImg3.image = UIImage(data: data!)
+                                    
+                                    
+                                }
+                                
+                                
+                            }
+                        }).resume()
+                    }
+                }
+                
+            })
+        
+      
     }
     
     
