@@ -13,7 +13,9 @@ import FirebaseStorage
 import FirebaseDatabase
 import SDWebImage
 
-class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDelegate, UIPickerViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource {
+
+
+class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDelegate, UIPickerViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
 
     @IBOutlet weak var lblName: UILabel!
     @IBOutlet weak var tbDescription: UITextView!
@@ -24,6 +26,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
    // @IBOutlet weak var ugh: UIImageView!
     @IBOutlet weak var tableView1: UITableView!
     @IBOutlet weak var tableView2: UITableView!
+    //@IBOutlet weak var tbPrice1: UITextField!
     
 
     var dataRef = FIRDatabase.database().reference()
@@ -54,10 +57,16 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     var temp2: String!
     var temp3: String!
     
+    var key: Int!
+    
+    var token: String!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+
         
+        //print("the key is \(cellNumber)")
         
         tbDescription.delegate = self
         placeholderLabel = UILabel()
@@ -73,7 +82,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         
         SetUp()
         SetPic()
-        print(posts)
+        //print(posts)
         
         // Do any additional setup after loading the view.
     }
@@ -82,20 +91,14 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     func textViewDidChangeSelection(_ textView: UITextView) {
         placeholderLabel.isHidden = !tbDescription.text.isEmpty
     }
-    func textViewDidBeginEditing(_ textView: UITextView) {
-        
-                if (tbDescription.textColor == UIColor.lightGray || tbDescription.text == "Enter A Detailed Description")
-                {
-                    tbDescription.text = ""
-                    tbDescription.textColor = UIColor.black
-                }
-    }
-    
+ 
+  
  
     func textViewDidChange(_ textView: UITextView) {
-        self.dataRef.child("users").child(self.loggedUser!.uid).child("about").setValue(tbDescription.text)
+       self.dataRef.child("artistProfiles").child(token).child("about").setValue(tbDescription.text)
         
     }
+    
     
     
     ////////////////////////////////////////////////////////////////////////////////
@@ -118,7 +121,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     }
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         tracker = row
-        print(tracker)
+        //print(tracker)
         
     }
     
@@ -147,15 +150,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         case 0:
             
             myImageView.image = tempImg1.image
-            
-           
-         
-            
-            
-           
-            
-           
-            
+  
             //
         case 1:
             
@@ -165,7 +160,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         case 2:
            
             myImageView.image = tempImg3.image
-            
+            //print("here")
 
         
         case 3: break
@@ -173,6 +168,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
             rowString = "Error: too many rows"
             myImageView.image = nil
         }
+        
         
         myLabel.text = rowString
         myView.addSubview(myLabel)
@@ -211,9 +207,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
             if (tracker == 0)
             {
                 status = "ProfilePic1"
-                
                 tempImg1.image = tempImg.image
-                
                 
                 UploadImage()
             }
@@ -240,6 +234,9 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     
     
     @IBAction func longPressPicker(_ sender: UILongPressGestureRecognizer) {
+        
+        
+        
         
         // this is for whena  row is long pressed to change the image
         let picker = UIImagePickerController()
@@ -296,7 +293,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         let imageName =  NSUUID().uuidString
         //let imageNameCover = NSUUID().uuidString
         
-        let storedImage = storageRef.child("imgProfile").child(loggedUser!.uid).child(imageName)
+        let storedImage = storageRef.child("imgProfile").child(self.token).child(imageName)
 
         
         
@@ -315,7 +312,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
                             return
                         }
                         if let urlText = url?.absoluteString{
-                            self.dataRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).updateChildValues(["\(self.status!)" : urlText], withCompletionBlock: { (error,ref) in
+                            self.dataRef.child("artistProfiles").child(self.token).updateChildValues(["\(self.status!)" : urlText], withCompletionBlock: { (error,ref) in
                                 if error != nil
                                 {
                                     
@@ -355,11 +352,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         //sets the label in the cell to be data from the array "posts" which is a string of values grabbed from the database
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")
         
-
-        
         let tb1 = cell?.viewWithTag(1) as! UITextView
-        print(posts)
-        print(indexPath.row)
         tb1.text = posts[indexPath.row]!
         
         return cell!
@@ -383,8 +376,10 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         let edit = UITableViewRowAction(style: .normal, title: "Edit") { action, index in
             //What happens when Edit button is tapped
             self.count = index.row
-            print(self.count)
-    
+            //print(self.count)
+            
+       
+            
             let alertController = UIAlertController(title: "Edit", message: "", preferredStyle: .alert)
             
             let saveAction = UIAlertAction(title: "Save", style: .default, handler: {
@@ -401,18 +396,18 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
                     //print("firstName \(firstTextField.text)")
                 if self.count == 0
                 {
-                    self.dataRef.child("users").child(self.loggedUser!.uid).child("Price1").child("Price1_0").setValue(firstTextField.text)
+                    self.dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_0").setValue(firstTextField.text)
                     }
                 else if self.count == 1
                     {
-                        self.dataRef.child("users").child(self.loggedUser!.uid).child("Price1").child("Price1_1").setValue(firstTextField.text)
+                        self.dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_1").setValue(firstTextField.text)
                     }
                  else if self.count == 2
                     {
-                        self.dataRef.child("users").child(self.loggedUser!.uid).child("Price1").child("Price1_2").setValue(firstTextField.text)
+                        self.dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_2").setValue(firstTextField.text)
                     }
                 }
-                
+            
                 
             })
             
@@ -458,23 +453,28 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         btnMessage.layer.cornerRadius = 5
         btnMessage.clipsToBounds = true
         
+        //print("token oss \(self.token!)")
         
-        dataRef.child("users").child(loggedUser!.uid).child("pic").observe(.value){
+        dataRef.child("artistProfiles").child(self.token).child("pic").observe(.value){
             (snap: FIRDataSnapshot) in
-            
+            if snap.exists() == true{
             if let pic = snap.value as? String{
                 self.url = NSURL(string:pic)
                 //print(self.url)
+                }
+            else{
+                
+                }
             }
         }
         
         
-        dataRef.child("users").child(loggedUser!.uid).child("name").observe(.value){
+        dataRef.child("artistProfiles").child(self.token).child("name").observe(.value){
             (snap: FIRDataSnapshot) in
             self.lblName.text = snap.value as? String
         }
         
-        dataRef.child("users").child(loggedUser!.uid).child("about").observe(.value){
+        dataRef.child("artistProfiles").child(self.token).child("about").observe(.value){
             (snap: FIRDataSnapshot) in
             self.tbDescription.text = snap.value as? String
             
@@ -486,7 +486,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
             tbDescription.textColor = UIColor.lightGray
             
         }
-        dataRef.child("users").child(loggedUser!.uid).child("Price1").child("Price1_0").observe(.value){
+        dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_0").observe(.value){
             (snap: FIRDataSnapshot) in
             self.temp1 = snap.value as? String
             if self.temp1 != nil
@@ -498,7 +498,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
             
             }
         }
-        dataRef.child("users").child(loggedUser!.uid).child("Price1").child("Price1_1").observe(.value){
+        dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_1").observe(.value){
             (snap: FIRDataSnapshot) in
             self.temp2 = snap.value as? String
             if self.temp2 != nil
@@ -511,7 +511,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
                 
             }
         }
-        dataRef.child("users").child(loggedUser!.uid).child("Price1").child("Price1_2").observe(.value){
+        dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_2").observe(.value){
             (snap: FIRDataSnapshot) in
             self.temp3 = snap.value as? String
             if self.temp3 != nil
@@ -527,13 +527,13 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         
 
         
-        print(posts)
+        //print(posts)
 
     }
     func SetPic()
     {
        
-                   dataRef.child("users").child(loggedUser!.uid).observeSingleEvent(of: .value, with: {  (snapshot) in
+                   dataRef.child("artistProfiles").child(self.token).observeSingleEvent(of: .value, with: {  (snapshot) in
                 
                 if let dict = snapshot.value as? [String: AnyObject]
                 {
@@ -570,7 +570,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
             })
             
      
-            dataRef.child("users").child(loggedUser!.uid).observeSingleEvent(of: .value, with: {  (snapshot) in
+            dataRef.child("artistProfiles").child(self.token).observeSingleEvent(of: .value, with: {  (snapshot) in
                 
                 if let dict = snapshot.value as? [String: AnyObject]
                 {
@@ -609,7 +609,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
        
         
        
-            dataRef.child("users").child(loggedUser!.uid).observeSingleEvent(of: .value, with: {  (snapshot) in
+            dataRef.child("artistProfiles").child(self.token).observeSingleEvent(of: .value, with: {  (snapshot) in
                 
                 if let dict = snapshot.value as? [String: AnyObject]
                 {
@@ -649,6 +649,48 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
       
     }
     
+    @IBAction func longPrice1(_ sender: UILongPressGestureRecognizer) {
+        let alertController = UIAlertController(title: "Edit Pricing", message: "", preferredStyle: .alert)
+        
+        let saveAction = UIAlertAction(title: "Save", style: .default, handler: {
+            alert -> Void in
+            
+            let firstTextField = alertController.textFields![0] as UITextField
+            
+            if firstTextField.text == ""
+            {
+                
+            }
+            else
+            {
+            self.dataRef.child("artistProfiles").child(self.token).child("Pricing1").child("Price1_0").setValue(firstTextField.text)
+               
+            }
+            
+            
+        })
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: {
+            (action : UIAlertAction!) -> Void in
+            
+            
+        })
+        
+        alertController.addTextField { (textField : UITextField!) -> Void in
+            textField.placeholder = "Describe this pricing"
+        }
+        
+        alertController.addAction(saveAction)
+        alertController.addAction(cancelAction)
+        
+        self.present(alertController, animated: true, completion: nil)
+        
+        
+        print("true")
+        
     
-    
+    }
+
+
+
 }

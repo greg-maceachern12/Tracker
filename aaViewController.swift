@@ -13,11 +13,13 @@ import FirebaseAuth
 import SDWebImage
 
 struct postStruct2 {
-    let title: String!
+    let name: String!
     let price: String!
-    let date: String!
+    let skills: String!
     let picture: NSURL!
+    let token: String!
 }
+
 
 class aaViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
@@ -28,6 +30,10 @@ class aaViewController: UIViewController, UITableViewDelegate, UITableViewDataSo
     var posts = [postStruct2]()
     
     var dataRef: FIRDatabaseReference!
+    var cellNumber : Int!
+    var cellID: String!
+    
+    
     
     let loggedUser = FIRAuth.auth()?.currentUser
 
@@ -39,24 +45,41 @@ class aaViewController: UIViewController, UITableViewDelegate, UITableViewDataSo
                 dataRef = FIRDatabase.database().reference()
         
         //grabbing the title, price, date and picture to a structure and storing that in an array
-                dataRef.child("posts").queryOrderedByKey().observe(.childAdded, with: { (snapshot) in
-                    
-                    let snapshotValueTitle = snapshot.value as? NSDictionary
-                    let Title = snapshotValueTitle?["title"] as? String
-                    
+                dataRef.child("artistProfiles").queryOrderedByKey().observe(.childAdded, with: { (snapshot) in
+//                    
+                    if snapshot.exists() == true{
+                    let snapshotValueName = snapshot.value as? NSDictionary
+                    let name = snapshotValueName?["name"] as? String
+
                     let snapshotValuePrice = snapshot.value as? NSDictionary
-                    let Price = snapshotValuePrice?["price"] as? String
+                    let Price = snapshotValuePrice?["Price1_0"] as? String
                 
                     let snapshotValueDate = snapshot.value as? NSDictionary
-                    let Date = snapshotValueDate?["date"] as? String
-                    
+                    let Skills = snapshotValueDate?["skills"] as? String
+
                     let snapshotValuePic = snapshot.value as? NSDictionary
-                    let pic = snapshotValuePic?["img"] as? String
+                    let pic = snapshotValuePic?["pic"] as? String
                     let url = NSURL(string:pic!)
+                        
+                    let snapshotValueToken = snapshot.value as? NSDictionary
+                    let Token = snapshotValueToken?["token"] as? String
+                        
+                    self.posts.insert(postStruct2(name: name, price: Price, skills: Skills, picture:url, token: Token), at: 0)
+                    }
+                    else
+                    {
+                        let alertContoller = UIAlertController(title: "Oops!", message: "Please Enter a Username/Password", preferredStyle: .alert)
+                        
+                        let defaultAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+                        alertContoller.addAction(defaultAction)
+                        
+                        self.present(alertContoller, animated:true, completion: nil)
+                    }
                     
                     
                     
-                    self.posts.insert(postStruct2(title: Title, price: Price, date: Date, picture:url), at: 0)
+                   
+                   
                     
                    
                     
@@ -89,7 +112,7 @@ class aaViewController: UIViewController, UITableViewDelegate, UITableViewDataSo
                
                 
                 let label1 = cell?.viewWithTag(1) as! UILabel
-                label1.text = posts[indexPath.row].title
+                label1.text = posts[indexPath.row].name
                 
             
                 let label2 = cell?.viewWithTag(2) as! UILabel
@@ -99,7 +122,7 @@ class aaViewController: UIViewController, UITableViewDelegate, UITableViewDataSo
             
                 
                 let label3 = cell?.viewWithTag(3) as! UILabel
-                label3.text = posts[indexPath.row].date
+                label3.text = posts[indexPath.row].skills
                 
                 
                 //not as functional as I want. Sets picture fine but if the user changes their propfile pic, this doesnt update it. This is in the method of sending the picture to the database, not so much setting it
@@ -110,4 +133,36 @@ class aaViewController: UIViewController, UITableViewDelegate, UITableViewDataSo
  
                 return cell!
 }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        cellNumber = indexPath.row
+        
+        
+//        dataRef.child("artistProfiles").queryOrderedByKey().observe(.childAdded, with: { (snapshot) in
+//            
+//            let snapshotValueName = snapshot.value as? NSDictionary
+//            let token = snapshotValueName?["name"] as? String
+//            self.cellID = token
+//            
+//        })
+        self.cellID = posts[cellNumber].token
+        print("token is \(self.cellID)")
+        
+        let myVC = storyboard?.instantiateViewController(withIdentifier: "Artist") as! ArtistViewController
+
+            myVC.token = self.cellID!
+        
+            print(myVC.token)
+            self.present(myVC, animated: true)
+    
+        
+        
+        
+//        }
+    }
+    
+    @IBAction func refreshAction(_ sender: Any) {
+        self.homeTab.reloadData()
+    }
+    
+    
 }

@@ -17,6 +17,7 @@ struct postStruct {
     let price: Int!
     let date: String!
     let picture: FIRDatabaseReference!
+    let token: String!
 }
 
 class NewPostViewController: UIViewController,UITextFieldDelegate,UITextViewDelegate {
@@ -105,12 +106,15 @@ class NewPostViewController: UIViewController,UITextFieldDelegate,UITextViewDele
                 
                 let tableTitle = self.tbTitle.text
                 let price = self.tbPrice.text
+                    
+                let token = self.loggedUser!.uid
               
                 
-                let post: [String : AnyObject] = ["title": tableTitle as AnyObject,
-                                                  "price": price as AnyObject,
+                let post: [String : AnyObject] = ["name": tableTitle as AnyObject,
+                                                  "about": price as AnyObject,
                                                   "date": dob as AnyObject,
-                                                  "img": urlText as AnyObject]
+                                                  "img": urlText as AnyObject,
+                                                  "token": token as AnyObject]
                 
                 
                 self.dataRef.child("posts").childByAutoId().setValue(post)

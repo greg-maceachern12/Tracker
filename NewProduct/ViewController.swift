@@ -41,6 +41,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
     
     var upload = false
     
+    var ableToSwitch = false
     //giving these values of nothing
     var loc = ""
     var birth = ""
@@ -64,7 +65,10 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         lblName.isUserInteractionEnabled = true
         btnSave.layer.mask?.cornerRadius = 5
         
-        
+        if ableToSwitch == true
+        {
+            tabBar.isEnabled = false
+        }
         
         
             //if user is logged out
@@ -95,18 +99,37 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         if upload == true{
             saveChange()
             self.NameRef.child("users").child(self.user!.uid).child("name").setValue(lblName.text)
-
+            self.NameRef.child("artistProfiles").child(self.user!.uid).child("name").setValue(lblName.text)
             upload = false
         }
         else{
             self.NameRef.child("users").child(self.user!.uid).child("name").setValue(lblName.text)
+            self.NameRef.child("artistProfiles").child(self.user!.uid).child("name").setValue(lblName.text)
             btnSave.isHidden=true
             
+            if loc == ""{
+                
+            }
+            else{
             self.NameRef.child("users").child(self.user!.uid).child("location").setValue(loc)
+            }
+            
+            if birth == ""{
+            }
+            else{
             self.NameRef.child("users").child(self.user!.uid).child("birthday").setValue(birth)
+            }
+            if gend == ""{
+            }
+            else{
             self.NameRef.child("users").child(self.user!.uid).child("gender").setValue(gend)
+            }
+            if ID == ""{
+            }
+            else{
+            
             self.NameRef.child("users").child(self.user!.uid).child("ID").setValue(ID)
-            print(ID)
+            }
 
         }
     }
@@ -158,6 +181,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
                             else
                             {
                             self.imgMain?.image = UIImage(data: data!)
+                            self.ableToSwitch = true
                             self.Loader.stopAnimating()
                             }
                             
@@ -285,9 +309,20 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
                                 return
                             }
                             self.Loader.stopAnimating()
+                            self.ableToSwitch = true
                             self.btnSave.isHidden = true
                         })
-                        }
+                        self.NameRef.child("artistProfiles").child((FIRAuth.auth()?.currentUser?.uid)!).updateChildValues(["pic" : urlText], withCompletionBlock: { (error,ref) in
+                            if error != nil
+                            {
+                                print(error!)
+                                return
+                            }
+                            self.Loader.stopAnimating()
+                            self.ableToSwitch = true
+                            self.btnSave.isHidden = true
+                        })
+                    }
                     })
                 })
             }
@@ -468,10 +503,10 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             }
             
             let secondTextField = alertController.textFields![1] as UITextField
-            
+            secondTextField.placeholder = "Please enter a birthday(dd/mm/yy)"
             if secondTextField.text == ""
             {
-                secondTextField.placeholder = "Please enter a birthday(dd/mm/yy)"
+                
             }
             else
             {
@@ -484,10 +519,10 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             }
             
             let thirdTextField = alertController.textFields![2] as UITextField
-            
+            thirdTextField.placeholder = "Please enter a gender"
             if thirdTextField.text == ""
             {
-                thirdTextField.placeholder = "Please enter a gender"
+                
             }
             else
             {
@@ -500,10 +535,10 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             }
             
             let fourthTextField = alertController.textFields![3] as UITextField
-            
+            fourthTextField.placeholder = "Please enter a valid ID"
             if fourthTextField.text == ""
             {
-                fourthTextField.placeholder = "Please enter a valid ID"
+                
             }
             else
             {
@@ -575,6 +610,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         self.present(alertController, animated: true, completion: nil)
         
     }
+  
+    
    
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
