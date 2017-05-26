@@ -119,6 +119,7 @@ override func viewDidLoad() {
                         self.NameRef.child("users").child(self.loggedInUser!.uid).child("name").setValue(firstTextField.text)
                         self.NameRef.child("artistProfiles").child(self.loggedInUser!.uid).child("name").setValue(firstTextField.text)
                         self.NameRef.child("artistProfiles").child(self.loggedInUser!.uid).child("token").setValue(self.loggedInUser!.uid)
+                        self.NameRef.child("artistProfiles").child(self.loggedInUser!.uid).child("pic").setValue("default.ca")
                     
                         
                         self.Load.stopAnimating()

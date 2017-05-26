@@ -62,6 +62,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        
+        
         lblName.isUserInteractionEnabled = true
         btnSave.layer.mask?.cornerRadius = 5
         
@@ -100,6 +102,29 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             saveChange()
             self.NameRef.child("users").child(self.user!.uid).child("name").setValue(lblName.text)
             self.NameRef.child("artistProfiles").child(self.user!.uid).child("name").setValue(lblName.text)
+            if loc == ""{
+                
+            }
+            else{
+                self.NameRef.child("users").child(self.user!.uid).child("location").setValue(loc)
+            }
+            
+            if birth == ""{
+            }
+            else{
+                self.NameRef.child("users").child(self.user!.uid).child("birthday").setValue(birth)
+            }
+            if gend == ""{
+            }
+            else{
+                self.NameRef.child("users").child(self.user!.uid).child("gender").setValue(gend)
+            }
+            if ID == ""{
+            }
+            else{
+                
+                self.NameRef.child("users").child(self.user!.uid).child("ID").setValue(ID)
+            }
             upload = false
         }
         else{

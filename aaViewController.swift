@@ -41,6 +41,11 @@ class aaViewController: UIViewController, UITableViewDelegate, UITableViewDataSo
         super.viewDidLoad()
         
         
+        //without this method, the code would run to fast and the data wouldnt have time to load, giving nil which casued it to crash
+        let delayInSeconds = 0.2
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayInSeconds) {}
+        
+        self.posts.removeAll()
         
                 dataRef = FIRDatabase.database().reference()
         
@@ -59,10 +64,23 @@ class aaViewController: UIViewController, UITableViewDelegate, UITableViewDataSo
 
                     let snapshotValuePic = snapshot.value as? NSDictionary
                     let pic = snapshotValuePic?["pic"] as? String
-                    let url = NSURL(string:pic!)
+                    //let url = NSURL(string:pic!)
+                        var url = NSURL()
+                        if (pic != nil || pic != "default.ca" || pic != "")
+                        {
+                            let url2 = NSURL(string:pic!)
+                            url = url2!
+                        }
+                        else
+                        {
+                            let url2 = NSURL(string:"")
+                            url = url2!
+                        }
+                    
                         
                     let snapshotValueToken = snapshot.value as? NSDictionary
                     let Token = snapshotValueToken?["token"] as? String
+                        
                         
                     self.posts.insert(postStruct2(name: name, price: Price, skills: Skills, picture:url, token: Token), at: 0)
                     }
@@ -161,7 +179,8 @@ class aaViewController: UIViewController, UITableViewDelegate, UITableViewDataSo
     }
     
     @IBAction func refreshAction(_ sender: Any) {
-        self.homeTab.reloadData()
+     
+        self.viewDidLoad()
     }
     
     
