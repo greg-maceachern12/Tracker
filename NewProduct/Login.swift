@@ -238,7 +238,7 @@ override func viewDidLoad() {
     {
         let storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         
-        let vc: UITabBarController = storyboard.instantiateViewController(withIdentifier: "Start") as! UITabBarController
+        let vc: UIViewController = storyboard.instantiateViewController(withIdentifier: "Home")
         
         self.present(vc, animated: true, completion: nil)
     }

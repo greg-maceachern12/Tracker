@@ -46,7 +46,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
     var loc = ""
     var birth = ""
     var gend = ""
-    var ID = ""
+    var skills = ""
     
     
     var imagePicker = UIImagePickerController()
@@ -119,11 +119,11 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             else{
                 self.NameRef.child("users").child(self.user!.uid).child("gender").setValue(gend)
             }
-            if ID == ""{
+            if skills == ""{
             }
             else{
                 
-                self.NameRef.child("users").child(self.user!.uid).child("ID").setValue(ID)
+                self.NameRef.child("users").child(self.user!.uid).child("skills").setValue(skills)
             }
             upload = false
         }
@@ -149,11 +149,12 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             else{
             self.NameRef.child("users").child(self.user!.uid).child("gender").setValue(gend)
             }
-            if ID == ""{
+            if skills == ""{
             }
             else{
             
-            self.NameRef.child("users").child(self.user!.uid).child("ID").setValue(ID)
+            self.NameRef.child("users").child(self.user!.uid).child("skills").setValue(skills)
+            self.NameRef.child("artistProfiles").child(self.user!.uid).child("skills").setValue(skills)
             }
 
         }
@@ -252,11 +253,11 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             }
             
         }
-        NameRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("ID").observe(.value){
+        NameRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("skills").observe(.value){
             (snap: FIRDataSnapshot) in
             if let temp4 = snap.value as? String{
-                self.ID = temp4
-                self.lblID.text = "ID Verification: \(temp4)"
+                self.skills = temp4
+                self.lblID.text = "Skills: \(temp4)"
             }
         }
     
@@ -560,7 +561,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             }
             
             let fourthTextField = alertController.textFields![3] as UITextField
-            fourthTextField.placeholder = "Please enter a valid ID"
+            fourthTextField.placeholder = "Please enter some skills"
             if fourthTextField.text == ""
             {
                 
@@ -569,8 +570,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             {
                 //print("firstName \(firstTextField.text)")
                 if let temp4 = fourthTextField.text{
-                self.lblID.text = "ID Verification: \(temp4)"
-                self.ID = temp4
+                self.lblID.text = "Skills: \(temp4)"
+                self.skills = temp4
                 self.btnSave.isHidden = false
                 }
             }
@@ -618,13 +619,13 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             
         }
         alertController.addTextField { (fourthTextField : UITextField!) -> Void in
-            if (self.lblID.text == "ID Verification: Not Declared" || self.lblID.text == "ID Verification:")
+            if (self.lblID.text == "Skills: Not Declared" || self.lblID.text == "Skills:")
             {
-                fourthTextField.placeholder = "Please enter a valid ID"
+                fourthTextField.placeholder = "Please enter your skills seperated by commas"
             }
             else
             {
-                fourthTextField.text = self.ID
+                fourthTextField.text = self.skills
             }
             
         }
