@@ -22,8 +22,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        UITabBarItem.appearance().setTitleTextAttributes([NSFontAttributeName: UIFont(name: "Avenir Next", size: 9)!], for: .normal)
+       
         
+        UINavigationBar.appearance().titleTextAttributes = [
+            NSFontAttributeName: UIFont(name: "Avenir Next", size: 15)!
+        ]
+    
         UITabBar.appearance().tintColor = UIColor(red: 253.0/255.0, green: 146.0/255.0, blue: 9.0/255.0, alpha: 1.0)
         
         //FIRApp.configure()

@@ -63,20 +63,16 @@ class aaViewController: UIViewController, UITableViewDelegate, UITableViewDataSo
                     let Skills = snapshotValueDate?["skills"] as? String
 
                     let snapshotValuePic = snapshot.value as? NSDictionary
-                    let pic = snapshotValuePic?["pic"] as? String
-                    //let url = NSURL(string:pic!)
                         var url = NSURL()
-                        if (pic != nil || pic != "default.ca" || pic != "")
-                        {
-                            let url2 = NSURL(string:pic!)
-                            url = url2!
-                        }
-                        else
-                        {
-                            let url2 = NSURL(string:"")
-                            url = url2!
-                        }
+                    if let pic = snapshotValuePic?["pic"] as? String
+                    {
+                        url = NSURL(string:pic)!
+                       
+                    }
+                    else{
+                        url = NSURL(string:"")!
                     
+                        }
                         
                     let snapshotValueToken = snapshot.value as? NSDictionary
                     let Token = snapshotValueToken?["token"] as? String
@@ -163,13 +159,13 @@ class aaViewController: UIViewController, UITableViewDelegate, UITableViewDataSo
 //            
 //        })
         self.cellID = posts[cellNumber].token
-        print("token is \(self.cellID)")
+//        print("token is \(self.cellID)")
         
         let myVC = storyboard?.instantiateViewController(withIdentifier: "Artist") as! ArtistViewController
 
             myVC.token = self.cellID!
         
-            print(myVC.token)
+//            print(myVC.token)
             self.present(myVC, animated: true)
     
         

@@ -90,7 +90,7 @@ override func viewDidLoad() {
         else
         {
             self.Load.startAnimating()
-            let alertController = UIAlertController(title: "Add New Name", message: "", preferredStyle: .alert)
+            let alertController = UIAlertController(title: "Enter Your Name", message: "", preferredStyle: .alert)
             
             let saveAction = UIAlertAction(title: "Save", style: .default, handler: {
                 alert -> Void in

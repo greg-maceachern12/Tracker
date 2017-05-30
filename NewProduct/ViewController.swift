@@ -188,9 +188,10 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             NameRef.child("users").child(uid!).observeSingleEvent(of: .value, with: {  (snapshot) in
                 if let dict = snapshot.value as? [String: AnyObject]
                 {
-                    
+            
                 if let profileImageURL = dict["pic"] as? String
                 {
+                
                     
                     let url = URL(string: profileImageURL)
                     URLSession.shared.dataTask(with: url!, completionHandler: { (data, response, error) in
@@ -216,6 +217,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
                         
                     }).resume()
                     
+                    }
+                else{
+                        self.Loader.stopAnimating()
                     }
                 }
         })
