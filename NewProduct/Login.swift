@@ -116,10 +116,10 @@ override func viewDidLoad() {
                         self.tbUser.text = ""
                         self.tbPassword.text = ""
                         self.lblUser.text = user!.email
-                        self.NameRef.child("users").child(self.loggedInUser!.uid).child("name").setValue(firstTextField.text)
-                        self.NameRef.child("artistProfiles").child(self.loggedInUser!.uid).child("name").setValue(firstTextField.text)
-                        self.NameRef.child("artistProfiles").child(self.loggedInUser!.uid).child("token").setValue(self.loggedInUser!.uid)
-                        self.NameRef.child("artistProfiles").child(self.loggedInUser!.uid).child("pic").setValue("default.ca")
+                        self.NameRef.child("users").child(self.loggedInUser!.uid).child("Name").setValue(firstTextField.text)
+//                        self.NameRef.child("artistProfiles").child(self.loggedInUser!.uid).child("name").setValue(firstTextField.text)
+//                        self.NameRef.child("artistProfiles").child(self.loggedInUser!.uid).child("token").setValue(self.loggedInUser!.uid)
+//                        self.NameRef.child("artistProfiles").child(self.loggedInUser!.uid).child("pic").setValue("default.ca")
                     
                         
                         self.Load.stopAnimating()

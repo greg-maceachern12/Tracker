@@ -54,13 +54,13 @@ class aaViewController: UIViewController, UITableViewDelegate, UITableViewDataSo
 //                    
                     if snapshot.exists() == true{
                     let snapshotValueName = snapshot.value as? NSDictionary
-                    let name = snapshotValueName?["name"] as? String
+                    let name = snapshotValueName?["Name"] as? String
 
                     let snapshotValuePrice = snapshot.value as? NSDictionary
                     let Price = snapshotValuePrice?["Price1_0"] as? String
                 
                     let snapshotValueDate = snapshot.value as? NSDictionary
-                    let Skills = snapshotValueDate?["skills"] as? String
+                    let Skills = snapshotValueDate?["Skills"] as? String
 
                     let snapshotValuePic = snapshot.value as? NSDictionary
                         var url = NSURL()

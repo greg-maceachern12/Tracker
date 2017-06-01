@@ -59,29 +59,32 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     var temp2: String!
     var temp3: String!
     
-    var key: Int!
+    //var key: Int!
     
     var token: String!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //setting the scroll view size
         Scroller.contentSize = CGSize(width: self.view.frame.width, height: 1400)
         
+        
+        //if the artist profile page is NOT the current user, disable the ability to edit
         if token != loggedUser?.uid
         {
             tbDescription.isUserInteractionEnabled = false
             Long1.isEnabled = false
             LongPrice.isEnabled = false
             
-            dataRef.child("artistProfiles").child(self.token).child("name").observe(.value){
+            dataRef.child("artistProfiles").child(self.token).child("Name").observe(.value){
                 (snap: FIRDataSnapshot) in
                 self.NAVTitle.title = "\(snap.value as! String)'s Profile"
             }
         }
         else
         {
-            dataRef.child("artistProfiles").child(self.token).child("name").observe(.value){
+            dataRef.child("artistProfiles").child(self.token).child("Name").observe(.value){
                 (snap: FIRDataSnapshot) in
                 self.NAVTitle.title = "\(snap.value as! String) (Your Profile)"
             }
@@ -90,6 +93,8 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         
         //print("the key is \(cellNumber)")
         
+        
+        //setting placeholder text for the textview
         tbDescription.delegate = self
         placeholderLabel = UILabel()
         placeholderLabel.lineBreakMode = NSLineBreakMode.byWordWrapping
@@ -120,7 +125,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
   
  
     func textViewDidChange(_ textView: UITextView) {
-       self.dataRef.child("artistProfiles").child(token).child("about").setValue(tbDescription.text)
+       self.dataRef.child("artistProfiles").child(token).child("About").setValue(tbDescription.text)
         
     }
     
@@ -150,9 +155,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         
     }
     
-    
-    
-    
+
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
         
         //declaring the things which will be in the pickerview
@@ -163,9 +166,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         myLabel.textAlignment = NSTextAlignment.center
         myLabel.backgroundColor = UIColor.clear
         var rowString = String()
-        
-        
-        
+  
         Loader.color = UIColor.white
     
     
@@ -533,9 +534,14 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     }
     
     
+    @IBAction func btnMoreAction(_ sender: Any) {
+        
+       
+        
+    }
     
     
-    
+
     
     
     func SetUp(){
@@ -568,7 +574,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         
        
         
-        dataRef.child("artistProfiles").child(self.token).child("about").observe(.value){
+        dataRef.child("artistProfiles").child(self.token).child("About").observe(.value){
             (snap: FIRDataSnapshot) in
             self.tbDescription.text = snap.value as? String
             
@@ -590,7 +596,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
             tbDescription.textColor = UIColor.lightGray
             
         }
-        dataRef.child("artistProfiles").child(self.token).child("name").observe(.value){
+        dataRef.child("artistProfiles").child(self.token).child("Name").observe(.value){
             (snap: FIRDataSnapshot) in
             self.lblName.text = snap.value as? String
         }
@@ -644,7 +650,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     func SetPic()
     {
        
-                   dataRef.child("artistProfiles").child(self.token).observeSingleEvent(of: .value, with: {  (snapshot) in
+            dataRef.child("artistProfiles").child(self.token).observeSingleEvent(of: .value, with: {  (snapshot) in
                 
                 if let dict = snapshot.value as? [String: AnyObject]
                 {

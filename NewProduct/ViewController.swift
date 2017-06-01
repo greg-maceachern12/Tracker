@@ -18,7 +18,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
     
     @IBOutlet weak var lblName: UILabel!
     @IBOutlet weak var imgMain: UIImageView!
-    @IBOutlet weak var Logout: UIButton!
+    //@IBOutlet weak var Logout: UIButton!
     @IBOutlet weak var Loader: UIActivityIndicatorView!
     @IBOutlet var tap: UITapGestureRecognizer!
     @IBOutlet var longpress: UILongPressGestureRecognizer!
@@ -53,11 +53,13 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
     
     var state = false
     
+    var artistCreate = false
+    
     let user = FIRAuth.auth()?.currentUser
     
     //I was being lazy and made variables for these references
-   let NameLoad = FIRDatabase.database().reference().child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("name")
-    let aboutLoad = FIRDatabase.database().reference().child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("about")
+   let NameLoad = FIRDatabase.database().reference().child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("Name")
+    let aboutLoad = FIRDatabase.database().reference().child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("About")
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -100,79 +102,116 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         
         if upload == true{
             saveChange()
-            self.NameRef.child("users").child(self.user!.uid).child("name").setValue(lblName.text)
-            self.NameRef.child("artistProfiles").child(self.user!.uid).child("name").setValue(lblName.text)
+            self.NameRef.child("users").child(self.user!.uid).child("Name").setValue(lblName.text)
+            //self.NameRef.child("artistProfiles").child(self.user!.uid).child("name").setValue(lblName.text)
             if loc == ""{
                 
             }
             else{
-                self.NameRef.child("users").child(self.user!.uid).child("location").setValue(loc)
+                self.NameRef.child("users").child(self.user!.uid).child("Location").setValue(loc)
             }
             
             if birth == ""{
             }
             else{
-                self.NameRef.child("users").child(self.user!.uid).child("birthday").setValue(birth)
+                self.NameRef.child("users").child(self.user!.uid).child("Birthday").setValue(birth)
             }
             if gend == ""{
             }
             else{
-                self.NameRef.child("users").child(self.user!.uid).child("gender").setValue(gend)
+                self.NameRef.child("users").child(self.user!.uid).child("Gender").setValue(gend)
             }
             if skills == ""{
             }
-            else{
+            else
+            {
                 
-                self.NameRef.child("users").child(self.user!.uid).child("skills").setValue(skills)
+                self.NameRef.child("users").child(self.user!.uid).child("Skills").setValue(skills)
             }
+            
+            
+            
+            if artistCreate == true
+            {
+                if skills == ""{
+                }
+                else
+                {
+                    
+                    self.NameRef.child("artistProfiles").child(self.user!.uid).child("Skills").setValue(skills)
+                }
+                self.NameRef.child("artistProfiles").child(self.user!.uid).child("Name").setValue(lblName.text)
+            }
+            
             upload = false
         }
         else{
-            self.NameRef.child("users").child(self.user!.uid).child("name").setValue(lblName.text)
-            self.NameRef.child("artistProfiles").child(self.user!.uid).child("name").setValue(lblName.text)
+            self.NameRef.child("users").child(self.user!.uid).child("Name").setValue(lblName.text)
+           
             btnSave.isHidden=true
             
             if loc == ""{
                 
             }
             else{
-            self.NameRef.child("users").child(self.user!.uid).child("location").setValue(loc)
+            self.NameRef.child("users").child(self.user!.uid).child("Location").setValue(loc)
             }
             
             if birth == ""{
             }
             else{
-            self.NameRef.child("users").child(self.user!.uid).child("birthday").setValue(birth)
+            self.NameRef.child("users").child(self.user!.uid).child("Birthday").setValue(birth)
             }
             if gend == ""{
             }
             else{
-            self.NameRef.child("users").child(self.user!.uid).child("gender").setValue(gend)
+            self.NameRef.child("users").child(self.user!.uid).child("Gender").setValue(gend)
             }
             if skills == ""{
             }
-            else{
-            
-            self.NameRef.child("users").child(self.user!.uid).child("skills").setValue(skills)
-            self.NameRef.child("artistProfiles").child(self.user!.uid).child("skills").setValue(skills)
+            else
+            {
+                
+                self.NameRef.child("users").child(self.user!.uid).child("Skills").setValue(skills)
             }
-
+            
+            
+                if artistCreate == true
+                {
+                    
+                    
+                    if skills == ""{
+                    }
+                    else
+                    {
+                        
+                        self.NameRef.child("artistProfiles").child(self.user!.uid).child("Skills").setValue(skills)
+                    }
+                    
+                   
+                    self.NameRef.child("artistProfiles").child(self.user!.uid).child("Name").setValue(lblName.text)
+                }
         }
     }
-    
 
-    //when logout button is clicked (will be moved or put somewhere else. Temporary)
-    @IBAction func LogoutAct(_ sender: Any) {
-        
-       setupProfile()
-        try! FIRAuth.auth()?.signOut()
-        LogoutSeq()
-    }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
                                                     //SETTING UP THE PROFILE
     func setupProfile(){
+        
+        self.NameRef.child("artistProfiles").child(self.user!.uid).child("token").observe(.value){
+            (snap: FIRDataSnapshot) in
+            if snap.exists() == true
+            {
+                self.artistCreate = true
+            }
+            else
+            {
+                self.artistCreate = false
+            }
+            
+        }
     
         imgMain.layer.cornerRadius = 4
         imgMain.clipsToBounds = true
@@ -234,7 +273,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             
         }
 
-        NameRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("location").observe(.value){
+        NameRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("Location").observe(.value){
             (snap: FIRDataSnapshot) in
             if let temp1 = snap.value as? String{
                 self.loc = temp1
@@ -242,14 +281,14 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             }
             
         }
-        NameRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("birthday").observe(.value){
+        NameRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("Birthday").observe(.value){
             (snap: FIRDataSnapshot) in
             if let temp2 = snap.value as? String{
                 self.birth = temp2
                 self.lblBirth.text = "Birthday: \(temp2)"
             }
         }
-        NameRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("gender").observe(.value){
+        NameRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("Gender").observe(.value){
             (snap: FIRDataSnapshot) in
             if let temp3 = snap.value as? String{
                 self.gend = temp3
@@ -257,7 +296,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             }
             
         }
-        NameRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("skills").observe(.value){
+        NameRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("Skills").observe(.value){
             (snap: FIRDataSnapshot) in
             if let temp4 = snap.value as? String{
                 self.skills = temp4
@@ -342,6 +381,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
                             self.ableToSwitch = true
                             self.btnSave.isHidden = true
                         })
+                        if self.artistCreate == true
+                        {
                         self.NameRef.child("artistProfiles").child((FIRAuth.auth()?.currentUser?.uid)!).updateChildValues(["pic" : urlText], withCompletionBlock: { (error,ref) in
                             if error != nil
                             {
@@ -352,6 +393,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
                             self.ableToSwitch = true
                             self.btnSave.isHidden = true
                         })
+                        }
                     }
                     })
                 })
@@ -641,6 +683,82 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         
     }
   
+    @IBAction func btnMoreAction(_ sender: Any) {
+        
+        
+        var alertTitle: String!
+        if artistCreate == true
+            {
+                alertTitle = "View Artist Profile"
+            }
+            else
+            {
+                alertTitle = "Create Artist Profile"
+            }
+        
+        let myActionSheet = UIAlertController(title: "Options", message: "Select", preferredStyle: UIAlertControllerStyle.actionSheet)
+        
+        
+        let Logout = UIAlertAction(title: "Logout", style: UIAlertActionStyle.default) { (action) in
+            
+            self.setupProfile()
+            try! FIRAuth.auth()?.signOut()
+            self.LogoutSeq()
+            
+        }
+        
+        let createArtist = UIAlertAction(title: alertTitle, style: UIAlertActionStyle.default) { (action) in
+            
+            
+                
+                if self.artistCreate == true
+                {
+                    
+                }
+                else{
+                    
+                    self.NameRef.child("artistProfiles").child(self.user!.uid).child("Name").setValue(self.lblName.text)
+                    
+                    self.NameRef.child("artistProfiles").child(self.user!.uid).child("token").setValue(self.user!.uid)
+                    
+                    self.NameRef.child("users").child(self.user!.uid).child("pic").observe(.value){
+                        (snap: FIRDataSnapshot) in
+                        
+                        if snap.exists() == true
+                        {
+                            self.NameRef.child("artistProfiles").child(self.user!.uid).child("pic").setValue(snap.value as! String)
+                        }
+                        else{
+                            self.NameRef.child("artistProfiles").child(self.user!.uid).child("pic").setValue("default.ca")
+                        }
+                    }
+                    
+                }
+                
+                let myVC = self.storyboard?.instantiateViewController(withIdentifier: "Artist") as! ArtistViewController
+                
+                myVC.token = self.user!.uid
+                
+                self.present(myVC, animated: true)
+               
+            
+
+            
+            
+            
+            
+            
+        }
+        
+        
+        
+        myActionSheet.addAction(createArtist)
+        myActionSheet.addAction(Logout)
+        myActionSheet.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel, handler: nil))
+        
+        self.present(myActionSheet, animated: true, completion: nil)
+    }
+    
     
    
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
