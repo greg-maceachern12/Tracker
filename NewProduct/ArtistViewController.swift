@@ -27,9 +27,11 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     @IBOutlet weak var tableView1: UITableView!
     @IBOutlet weak var tableView2: UITableView!
     @IBOutlet weak var lblPrice1: UILabel!
+    @IBOutlet weak var lblPrice2: UILabel!
     @IBOutlet var Long1: UILongPressGestureRecognizer!
     @IBOutlet weak var NAVTitle: UINavigationItem!
     @IBOutlet var LongPrice: UILongPressGestureRecognizer!
+    @IBOutlet var LongPrice2: UILongPressGestureRecognizer!
 
     var dataRef = FIRDatabase.database().reference()
     var storageRef = FIRStorage.storage().reference()
@@ -44,7 +46,8 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     var table1 = false
     var count = 0
     var posts:[String?] = ["Add Something!","Add Something!","Add Something!"]
-    var posts2:[String?] = []
+    var posts2:[String?] = ["Add Something!","Add Something!","Add Something!"]
+    //var posts2:[String?] = []
     
     var imagePicker = UIImagePickerController()
     var url: NSURL!
@@ -76,10 +79,19 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
             tbDescription.isUserInteractionEnabled = false
             Long1.isEnabled = false
             LongPrice.isEnabled = false
+            LongPrice2.isEnabled = false
+            
+           
             
             dataRef.child("artistProfiles").child(self.token).child("Name").observe(.value){
                 (snap: FIRDataSnapshot) in
+                if snap.exists() == true
+                {
                 self.NAVTitle.title = "\(snap.value as! String)'s Profile"
+                }
+                else{
+                    self.NAVTitle.title = ""
+                }
             }
         }
         else
@@ -87,6 +99,9 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
             dataRef.child("artistProfiles").child(self.token).child("Name").observe(.value){
                 (snap: FIRDataSnapshot) in
                 self.NAVTitle.title = "\(snap.value as! String) (Your Profile)"
+                self.btnPin.isHidden = true
+                self.btnBook.isHidden = true
+                self.btnMessage.isHidden = true
             }
         }
         
@@ -109,7 +124,8 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         
         SetUp()
         SetPic()
-        //print(posts)
+        
+    
         
         // Do any additional setup after loading the view.
     }
@@ -392,13 +408,27 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         //sets the label in the cell to be data from the array "posts" which is a string of values grabbed from the database
+        
+        if tableView == tableView1
+        {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")
         
         let tb1 = cell?.viewWithTag(1) as! UITextView
         tb1.text = posts[indexPath.row]!
         
         return cell!
-        
+        }
+            
+        else
+        {
+            let cell2 = tableView.dequeueReusableCell(withIdentifier: "Cell2")
+            
+            let tb1 = cell2?.viewWithTag(2) as! UITextView
+            tb1.text = posts2[indexPath.row]!
+            
+            return cell2!
+            
+        }
         
     }
     
@@ -408,6 +438,8 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         
         return true
     }
+    
+    
     
     @IBAction func LongPrice1(_ sender: UILongPressGestureRecognizer) {
         let alertController = UIAlertController(title: "Edit Pricing", message: "", preferredStyle: .alert)
@@ -426,8 +458,9 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
             else
             {
                 
+                
                 self.lblPrice1.text = "$\(firstTextField.text!)"
-                self.dataRef.child("artistProfiles").child(self.token).child("Pricing1").child("Price1_0").setValue(firstTextField.text)
+                self.dataRef.child("artistProfiles").child(self.token).child("Price1").child("Pricing1").setValue(firstTextField.text)
                 
                 
                 
@@ -458,6 +491,55 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
 
     }
     
+    @IBAction func LongPressPrice2(_ sender: UILongPressGestureRecognizer) {
+        
+        let alertController = UIAlertController(title: "Edit Pricing", message: "", preferredStyle: .alert)
+        
+        let saveAction = UIAlertAction(title: "Save", style: .default, handler: {
+            alert -> Void in
+            
+            let firstTextField = alertController.textFields![0] as UITextField
+            
+            firstTextField.keyboardType = UIKeyboardType.decimalPad
+            
+            if firstTextField.text == ""
+            {
+                
+            }
+            else
+            {
+                
+                
+                self.lblPrice2.text = "$\(firstTextField.text!)"
+                self.dataRef.child("artistProfiles").child(self.token).child("Price2").child("Pricing2").setValue(firstTextField.text)
+                
+                
+                
+                
+            }
+            
+            
+        })
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: {
+            (action : UIAlertAction!) -> Void in
+            
+            
+        })
+        
+        alertController.addTextField { (textField : UITextField!) -> Void in
+            textField.placeholder = "Describe this pricing"
+        }
+        
+        alertController.addAction(saveAction)
+        alertController.addAction(cancelAction)
+        
+        self.present(alertController, animated: true, completion: nil)
+        
+        
+    }
+    
+    
     
 
     func tableView(_ tableView: UITableView, editActionsForRowAt: IndexPath) -> [UITableViewRowAction]? {
@@ -468,9 +550,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         let edit = UITableViewRowAction(style: .normal, title: "Edit") { action, index in
             //What happens when Edit button is tapped
             self.count = index.row
-            //print(self.count)
-            
-       
+
             
             let alertController = UIAlertController(title: "Edit", message: "", preferredStyle: .alert)
             
@@ -485,18 +565,66 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
                 }
                 else
                 {
-                    //print("firstName \(firstTextField.text)")
+                    
                 if self.count == 0
-                {
-                    self.dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_0").setValue(firstTextField.text)
+                    {
+                        if tableView == self.tableView1
+                        {
+                             self.dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_0").setValue(firstTextField.text)
+                        }
+                            
+                        else
+                        {
+                            self.dataRef.child("artistProfiles").child(self.token).child("Price2").child("Price2_0").setValue(firstTextField.text)
+                            
+                        }
+                    
+                   
+                        
+                        
                     }
+                    
+                    
+                    
+                    
                 else if self.count == 1
                     {
-                        self.dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_1").setValue(firstTextField.text)
+                        
+                        
+                        if tableView == self.tableView1
+                        {
+                            self.dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_1").setValue(firstTextField.text)
+                        }
+                            
+                        else
+                        {
+                            self.dataRef.child("artistProfiles").child(self.token).child("Price2").child("Price2_1").setValue(firstTextField.text)
+                            
+                        }
+                        
+                        
                     }
+                    
+                    
+                    
+                    
+                    
                  else if self.count == 2
                     {
-                        self.dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_2").setValue(firstTextField.text)
+                        
+                        
+                        if tableView == self.tableView1
+                        {
+                            self.dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_2").setValue(firstTextField.text)
+                        }
+                            
+                        else
+                        {
+                            self.dataRef.child("artistProfiles").child(self.token).child("Price2").child("Price2_2").setValue(firstTextField.text)
+                            
+                        }
+                        
+                        
                     }
                 }
             
@@ -535,8 +663,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     
     
     @IBAction func btnMoreAction(_ sender: Any) {
-        
-       
+ 
         
     }
     
@@ -580,14 +707,20 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
             
         }
         
-        dataRef.child("artistProfiles").child(self.token).child("Pricing1").child("Price1_0").observe(.value){
+        dataRef.child("artistProfiles").child(self.token).child("Price1").child("Pricing1").observe(.value){
             (snap: FIRDataSnapshot) in
             if snap.exists() == true
             {
             self.lblPrice1.text = "$\(snap.value! as! String)"
             }
-            
-            
+        }
+        
+        dataRef.child("artistProfiles").child(self.token).child("Price2").child("Pricing2").observe(.value){
+            (snap: FIRDataSnapshot) in
+            if snap.exists() == true
+            {
+                self.lblPrice2.text = "$\(snap.value! as! String)"
+            }
         }
         
         if tbDescription.text == ""{
@@ -600,6 +733,8 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
             (snap: FIRDataSnapshot) in
             self.lblName.text = snap.value as? String
         }
+        
+        //Table1
         dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_0").observe(.value){
             (snap: FIRDataSnapshot) in
             self.temp1 = snap.value as? String
@@ -634,6 +769,51 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
             {
             self.posts[2] = self.temp3!
             self.tableView1.reloadData()
+            }
+            else{
+                
+            }
+     
+        }
+        
+        //Table2
+        
+        dataRef.child("artistProfiles").child(self.token).child("Price2").child("Price2_0").observe(.value){
+            (snap: FIRDataSnapshot) in
+            var temp4: String!
+            temp4 = snap.value as? String
+            if temp4 != nil
+            {
+                self.posts2[0] = temp4!
+                self.tableView2.reloadData()
+            }
+            else{
+                
+            }
+        }
+        dataRef.child("artistProfiles").child(self.token).child("Price2").child("Price2_1").observe(.value){
+            (snap: FIRDataSnapshot) in
+            var temp5: String!
+            temp5 = snap.value as? String
+            if temp5 != nil
+            {
+                self.posts2[1] = temp5!
+                self.tableView2.reloadData()
+            }
+            else{
+                
+            }
+        }
+        
+        
+        dataRef.child("artistProfiles").child(self.token).child("Price2").child("Price2_2").observe(.value){
+            (snap: FIRDataSnapshot) in
+            var temp6: String!
+            temp6 = snap.value as? String
+            if temp6 != nil
+            {
+                self.posts2[2] = temp6!
+                self.tableView2.reloadData()
             }
             else{
                 
@@ -764,6 +944,17 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
             })
         
       
+    }
+    
+    ///////////////////
+    
+    @IBAction func btnBook(_ sender: Any) {
+        let myVC = storyboard?.instantiateViewController(withIdentifier: "booking") as! BookingViewController
+        
+        myVC.userID = self.token
+        
+        //            print(myVC.token)
+        self.present(myVC, animated: true)
     }
     
     

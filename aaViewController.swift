@@ -139,7 +139,6 @@ class aaViewController: UIViewController, UITableViewDelegate, UITableViewDataSo
                 label3.text = posts[indexPath.row].skills
                 
                 
-                //not as functional as I want. Sets picture fine but if the user changes their propfile pic, this doesnt update it. This is in the method of sending the picture to the database, not so much setting it
                 let img4 = cell?.viewWithTag(4) as! UIImageView
                 img4.sd_setImage(with: posts[indexPath.row].picture as URL!, placeholderImage: UIImage(named: "City")!)
                 img4.layer.cornerRadius = 4
@@ -150,14 +149,8 @@ class aaViewController: UIViewController, UITableViewDelegate, UITableViewDataSo
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         cellNumber = indexPath.row
         
-        
-//        dataRef.child("artistProfiles").queryOrderedByKey().observe(.childAdded, with: { (snapshot) in
-//            
-//            let snapshotValueName = snapshot.value as? NSDictionary
-//            let token = snapshotValueName?["name"] as? String
-//            self.cellID = token
-//            
-//        })
+    
+
         self.cellID = posts[cellNumber].token
 //        print("token is \(self.cellID)")
         

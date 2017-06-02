@@ -22,24 +22,15 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Developed by Greg MacEachern" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="A77-Q5-OHQ">
-                                <rect key="frame" x="0.0" y="632" width="375" height="27"/>
-                                <fontDescription key="fontDescription" name="PingFangHK-Thin" family="PingFang HK" pointSize="19"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Screen Shot 2017-05-21 at 4.20.39 PM" translatesAutoresizingMaskIntoConstraints="NO" id="q6Q-98-Mww">
                                 <rect key="frame" x="0.0" y="254" width="375" height="159"/>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="xb3-aO-Qok" firstAttribute="top" secondItem="A77-Q5-OHQ" secondAttribute="bottom" constant="8" id="58a-rg-KFB"/>
                             <constraint firstItem="q6Q-98-Mww" firstAttribute="width" secondItem="Ze5-6b-2t3" secondAttribute="width" id="6we-xN-kuo"/>
-                            <constraint firstItem="A77-Q5-OHQ" firstAttribute="width" secondItem="Ze5-6b-2t3" secondAttribute="width" id="KiN-7A-mK1"/>
                             <constraint firstItem="q6Q-98-Mww" firstAttribute="height" secondItem="Ze5-6b-2t3" secondAttribute="height" multiplier="0.2386" id="QkY-qx-c8f"/>
                             <constraint firstItem="q6Q-98-Mww" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="a9X-WU-qNa"/>
-                            <constraint firstItem="A77-Q5-OHQ" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="acn-8K-6fR"/>
                             <constraint firstItem="q6Q-98-Mww" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="w6g-qy-Ksh"/>
                         </constraints>
                     </view>

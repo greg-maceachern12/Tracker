@@ -119,6 +119,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             if gend == ""{
             }
             else{
+            
                 self.NameRef.child("users").child(self.user!.uid).child("Gender").setValue(gend)
             }
             if skills == ""{
