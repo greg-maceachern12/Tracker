@@ -10,6 +10,7 @@ import UIKit
 import Firebase
 import CoreData
 
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -30,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
         UITabBar.appearance().tintColor = UIColor(red: 253.0/255.0, green: 146.0/255.0, blue: 9.0/255.0, alpha: 1.0)
         
-        //FIRApp.configure()
+
         return true
     }
 

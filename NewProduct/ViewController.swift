@@ -11,10 +11,11 @@
 import UIKit
 import Firebase
 import FirebaseAuth
+import CoreLocation
 import Photos
 
 
-class ViewController: UIViewController, UIImagePickerControllerDelegate,UINavigationControllerDelegate, UITextFieldDelegate {
+class ViewController: UIViewController, UIImagePickerControllerDelegate,UINavigationControllerDelegate, UITextFieldDelegate, CLLocationManagerDelegate {
     
     @IBOutlet weak var lblName: UILabel!
     @IBOutlet weak var imgMain: UIImageView!
@@ -26,6 +27,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
     @IBOutlet var longLabel: UILongPressGestureRecognizer!
     @IBOutlet weak var tbAbout: UITextField!
     @IBOutlet weak var tabBar: UITabBarItem!
+    @IBOutlet weak var lblEmail: UILabel!
     
     //declarations for about section
     @IBOutlet weak var lblLoc: UILabel!
@@ -48,6 +50,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
     var gend = ""
     var skills = ""
     
+    var email:String!
     
     var imagePicker = UIImagePickerController()
     
@@ -61,19 +64,21 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
    let NameLoad = FIRDatabase.database().reference().child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("Name")
     let aboutLoad = FIRDatabase.database().reference().child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("About")
     
+    let manager = CLLocationManager()
+    
+
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        manager.delegate = self
+        manager.desiredAccuracy = kCLLocationAccuracyBest
+        manager.requestWhenInUseAuthorization()
         
         
         lblName.isUserInteractionEnabled = true
         btnSave.layer.mask?.cornerRadius = 5
-        
-        if ableToSwitch == true
-        {
-            tabBar.isEnabled = false
-        }
-        
+
         
             //if user is logged out
         if FIRAuth.auth()?.currentUser?.uid == nil
@@ -89,11 +94,23 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         self.imgMain.isUserInteractionEnabled = true
        
     }
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let location = locations[0]
+        NameRef.child("users").child(self.user!.uid).child("location(LL)").setValue("\(location.coordinate.latitude),\(location.coordinate.longitude)")
+        print(manager.location!)
+        if manager.location != nil
+        {
+            manager.stopUpdatingLocation()
+        }
     
+    }
 
 
     //when save button is clicked
     @IBAction func SaveChanges(_ sender: Any) {
+        
+        self.manager.startUpdatingLocation()
+        
        // saveChange()
         
         
@@ -279,6 +296,15 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             if let temp1 = snap.value as? String{
                 self.loc = temp1
                 self.lblLoc.text = "Location: \(temp1)"
+            }
+            
+        }
+        
+        NameRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("Email").observe(.value){
+            (snap: FIRDataSnapshot) in
+            if let temp1 = snap.value as? String{
+                self.email = temp1
+                self.lblEmail.text = temp1
             }
             
         }
@@ -546,15 +572,22 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         btnSave.isHidden = false
     }
     
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     @IBAction func editClick(_ sender: Any) {
+        
+        
+        
+
         
        // This brings up the dialogue for changing the about field
         let alertController = UIAlertController(title: "Edit Information", message: "", preferredStyle: .alert)
         
         let saveAction = UIAlertAction(title: "Save", style: .default, handler: {
             alert -> Void in
+            
+            
             
             
             let firstTextField = alertController.textFields![0] as UITextField
@@ -702,6 +735,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         
         let Logout = UIAlertAction(title: "Logout", style: UIAlertActionStyle.default) { (action) in
             
+            
             self.setupProfile()
             try! FIRAuth.auth()?.signOut()
             self.LogoutSeq()
@@ -715,12 +749,29 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
                 if self.artistCreate == true
                 {
                     
+
+
                 }
                 else{
+                    if self.skills == ""
+                    {
+                        let alertContoller = UIAlertController(title: "Oops!", message: "Add a set of skills to procede", preferredStyle: .alert)
+                        
+                        let defaultAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+                        alertContoller.addAction(defaultAction)
+                        self.present(alertContoller, animated: true)
+                    }
+                    else{
+                    
                     
                     self.NameRef.child("artistProfiles").child(self.user!.uid).child("Name").setValue(self.lblName.text)
                     
                     self.NameRef.child("artistProfiles").child(self.user!.uid).child("token").setValue(self.user!.uid)
+                    
+                   
+                    self.NameRef.child("artistProfiles").child(self.user!.uid).child("skills").setValue(self.skills)
+                        
+                    self.NameRef.child("artistProfiles").child(self.user!.uid).child("Email").setValue(self.email)
                     
                     self.NameRef.child("users").child(self.user!.uid).child("pic").observe(.value){
                         (snap: FIRDataSnapshot) in
@@ -732,15 +783,16 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
                         else{
                             self.NameRef.child("artistProfiles").child(self.user!.uid).child("pic").setValue("default.ca")
                         }
+                        let myVC = self.storyboard?.instantiateViewController(withIdentifier: "Artist") as! ArtistViewController
+                        
+                        myVC.token = self.user!.uid
+                        
+                        self.present(myVC, animated: true)
                     }
                     
                 }
-                
-                let myVC = self.storyboard?.instantiateViewController(withIdentifier: "Artist") as! ArtistViewController
-                
-                myVC.token = self.user!.uid
-                
-                self.present(myVC, animated: true)
+            }
+            
                
             
 

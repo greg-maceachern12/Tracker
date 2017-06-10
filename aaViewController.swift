@@ -147,10 +147,8 @@ class aaViewController: UIViewController, UITableViewDelegate, UITableViewDataSo
                 return cell!
 }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        cellNumber = indexPath.row
         
-    
-
+        cellNumber = indexPath.row
         self.cellID = posts[cellNumber].token
 //        print("token is \(self.cellID)")
         

@@ -45,9 +45,12 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     
     var table1 = false
     var count = 0
+//    var posts = [String?]()
+//    var posts2 = [String?]()
+    
     var posts:[String?] = ["Add Something!","Add Something!","Add Something!"]
     var posts2:[String?] = ["Add Something!","Add Something!","Add Something!"]
-    //var posts2:[String?] = []
+  
     
     var imagePicker = UIImagePickerController()
     var url: NSURL!
@@ -62,9 +65,13 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     var temp2: String!
     var temp3: String!
     
-    //var key: Int!
+    var tableNumber: Int!
+    var uploadVar = true
+    var uploadCount = 0
     
     var token: String!
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -106,7 +113,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         }
         
         
-        //print("the key is \(cellNumber)")
+        print(posts)
         
         
         //setting placeholder text for the textview
@@ -131,6 +138,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     }
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.view.endEditing(true)
+        tbDescription.resignFirstResponder()
     }
     
     
@@ -396,11 +404,39 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
     
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+       
+//        if token == loggedUser?.uid
+//        {
+//            if tableView == tableView1
+//            {
+//                return posts.count + 1
+//            }
+//            else
+//            {
+//                return posts2.count + 1
+//            
+//            }
+//        }
+//        else
+//        {
+//            if tableView == tableView1
+//            {
+//                return posts.count
+//            }
+//            else
+//            {
+//                return posts2.count
+//                
+//            }
+//        }
         return 3
     }
+    
+        
+    
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //count = indexPath.row
-       // print(count)
+       
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 100
@@ -409,14 +445,16 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         
         //sets the label in the cell to be data from the array "posts" which is a string of values grabbed from the database
         
+        
+        
         if tableView == tableView1
         {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")
-        
-        let tb1 = cell?.viewWithTag(1) as! UITextView
-        tb1.text = posts[indexPath.row]!
-        
-        return cell!
+            let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")
+            
+            let tb1 = cell?.viewWithTag(1) as! UITextView
+            tb1.text = posts[indexPath.row]!
+            
+            return cell!
         }
             
         else
@@ -430,15 +468,120 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
             
         }
         
+        
+//        
+//        if tableView == tableView1
+//        {
+//        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")
+//        //print(posts.count)
+//            let tb1 = cell?.viewWithTag(1) as! UITextView
+//            tb1.text = posts[indexPath.row]!
+//            
+//            return cell!
+        
+//               if indexPath.row == posts.count
+//               {
+//                let myImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 100))
+//                let button = UIButton(frame: CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 100))
+//                button.backgroundColor = UIColor.clear
+//                button.addTarget(self, action: #selector(pressButton(button:)), for: .touchUpInside)
+//                myImageView.image = #imageLiteral(resourceName: "Add")
+//                
+//                let tb1 = cell?.viewWithTag(1) as! UITextView
+//                tb1.isHidden = true
+//                
+//                
+//                
+//                cell?.addSubview(myImageView)
+//                cell?.addSubview(button)
+//                return cell!
+//                
+//                
+//                }
+//               
+//               else {
+//                
+//                //print(indexPath.row)
+//                let tb1 = cell?.viewWithTag(1) as! UITextView
+//                tb1.text = posts[indexPath.row]!
+//                
+//                return cell!
+//                
+//                }
+            
+//        }
+//    
+//    
+//        else
+//        {
+//            let cell2 = tableView.dequeueReusableCell(withIdentifier: "Cell2")
+//            
+//            if indexPath.row == posts2.count
+//            {
+//                let myImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 100))
+//                let button = UIButton(frame: CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 100))
+//                button.backgroundColor = UIColor.clear
+//                button.addTarget(self, action: #selector(pressButton(button:)), for: .touchUpInside)
+//                myImageView.image = #imageLiteral(resourceName: "Add")
+//                
+//                let tb1 = cell2?.viewWithTag(2) as! UITextView
+//                tb1.isHidden = true
+//                
+//                
+//                
+//                cell2?.addSubview(myImageView)
+//                cell2?.addSubview(button)
+//                return cell2!
+//                
+//                
+//            }
+//                
+//            else {
+//                
+//                print(indexPath.row)
+//                let tb1 = cell2?.viewWithTag(2) as! UITextView
+//                tb1.text = posts2[indexPath.row]!
+//                
+//                return cell2!
+//                
+//            }
+//            
+//        }
+        
     }
     
+    
+
     
     
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        
+        if token == loggedUser?.uid
+        {
         return true
+        }
+        else{
+            return false
+        }
     }
     
+    func pressButton(button: UIButton) {
+        if posts.count <= 5
+        {
+       posts.append("Adding Something")
+        
+        tableView1.insertRows(at: [IndexPath(row: posts.count-1, section: 0)], with: .automatic)
+        
+        //print(posts)
+        }
+        else
+        {
+            let alertContoller = UIAlertController(title: "Oops!", message: "Only 5 conditions allowed", preferredStyle: .alert)
+            
+            let defaultAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+            alertContoller.addAction(defaultAction)
+            self.present(alertContoller, animated:true, completion: nil)
+        }
+    }
     
     
     @IBAction func LongPrice1(_ sender: UILongPressGestureRecognizer) {
@@ -483,10 +626,11 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         alertController.addAction(saveAction)
         alertController.addAction(cancelAction)
         
+        self.tableView1.reloadData()
         self.present(alertController, animated: true, completion: nil)
         
         
-        print("true")
+        //print("true")
         
 
     }
@@ -547,6 +691,43 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         //swipe to edit feature
           if token == loggedUser?.uid
           {
+            
+            let delete = UITableViewRowAction(style: .destructive, title: "Delete") { action, index in
+                //What happens when Edit button is tapped
+                self.count = index.row
+                
+                
+                
+                
+                    if tableView == self.tableView1
+                    {
+                         self.posts.remove(at: index.row)
+                        
+                        self.dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_\(self.count)").removeValue()
+                        
+                            self.tableView1.deleteRows(at: [index], with: UITableViewRowAnimation.automatic)
+                        
+                        //print(self.posts)
+                        
+                    }
+                        
+                    else
+                    {
+                         self.posts2.remove(at: index.row)
+                        
+                        self.dataRef.child("artistProfiles").child(self.token).child("Price2").child("Price2_\(self.count)").removeValue()
+                        
+                            self.tableView2.deleteRows(at: [index], with: UITableViewRowAnimation.automatic)
+                        
+                        
+                        
+                    }
+                    
+                    
+            }
+            
+            
+            
         let edit = UITableViewRowAction(style: .normal, title: "Edit") { action, index in
             //What happens when Edit button is tapped
             self.count = index.row
@@ -566,16 +747,20 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
                 else
                 {
                     
-                if self.count == 0
-                    {
+               
                         if tableView == self.tableView1
                         {
-                             self.dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_0").setValue(firstTextField.text)
+                             self.dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_\(index.row)").setValue(firstTextField.text)
+                            //print(index.row)
+                           // self.posts[index.row] = firstTextField.text
+                            //print(self.posts)
                         }
                             
                         else
                         {
-                            self.dataRef.child("artistProfiles").child(self.token).child("Price2").child("Price2_0").setValue(firstTextField.text)
+                            self.dataRef.child("artistProfiles").child(self.token).child("Price2").child("Price2_\(self.count)").setValue(firstTextField.text)
+                            
+                            self.posts2[self.count] = firstTextField.text
                             
                         }
                     
@@ -583,53 +768,11 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
                         
                         
                     }
-                    
-                    
-                    
-                    
-                else if self.count == 1
-                    {
-                        
-                        
-                        if tableView == self.tableView1
-                        {
-                            self.dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_1").setValue(firstTextField.text)
-                        }
-                            
-                        else
-                        {
-                            self.dataRef.child("artistProfiles").child(self.token).child("Price2").child("Price2_1").setValue(firstTextField.text)
-                            
-                        }
-                        
-                        
-                    }
-                    
-                    
-                    
-                    
-                    
-                 else if self.count == 2
-                    {
-                        
-                        
-                        if tableView == self.tableView1
-                        {
-                            self.dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_2").setValue(firstTextField.text)
-                        }
-                            
-                        else
-                        {
-                            self.dataRef.child("artistProfiles").child(self.token).child("Price2").child("Price2_2").setValue(firstTextField.text)
-                            
-                        }
-                        
-                        
-                    }
-                }
+                
             
                 
             })
+            
             
             let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: {
                 (action : UIAlertAction!) -> Void in
@@ -645,14 +788,18 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
             alertController.addAction(cancelAction)
             
             self.present(alertController, animated: true, completion: nil)
-        
-
-            
-            
+ 
         }
+            
+            
+            
+            
         edit.backgroundColor = .blue
         
-        return [edit]
+            
+        
+        return [edit, delete]
+        
         }
         else
           {
@@ -660,6 +807,7 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         }
         
     }
+    
     
     
     @IBAction func btnMoreAction(_ sender: Any) {
@@ -683,14 +831,14 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         btnMessage.layer.cornerRadius = 5
         btnMessage.clipsToBounds = true
         
-        //print("token oss \(self.token!)")
+
         
         dataRef.child("artistProfiles").child(self.token).child("pic").observe(.value){
             (snap: FIRDataSnapshot) in
             if snap.exists() == true{
             if let pic = snap.value as? String{
                 self.url = NSURL(string:pic)
-                //print(self.url)
+                
                 }
             else{
                 
@@ -735,96 +883,186 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
         }
         
         //Table1
+    
+        
         dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_0").observe(.value){
             (snap: FIRDataSnapshot) in
-            self.temp1 = snap.value as? String
-            if self.temp1 != nil
+            if snap.exists() == true
             {
-                self.posts[0] = self.temp1!
+                let temp1 = snap.value as? String
+                
+                self.posts[0] = temp1!
                 self.tableView1.reloadData()
             }
             else{
-            
+//                self.posts.insert("Add Something!", at: 0)
             }
         }
+        
+        
+       
+
         dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_1").observe(.value){
             (snap: FIRDataSnapshot) in
-            self.temp2 = snap.value as? String
-            if self.temp2 != nil
+            if snap.exists() == true
             {
-            self.posts[1] = self.temp2!
-            self.tableView1.reloadData()
+                let temp1 = snap.value as? String
+              
+                self.posts[1] = temp1!
+                self.tableView1.reloadData()
             }
-            else
-            {
-                
+            else{
+//               self.posts.insert("Add Something!", at: 1)
             }
         }
         
         
         dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_2").observe(.value){
             (snap: FIRDataSnapshot) in
-            self.temp3 = snap.value as? String
-            if self.temp3 != nil
+            if snap.exists() == true
             {
-            self.posts[2] = self.temp3!
-            self.tableView1.reloadData()
+                let temp1 = snap.value as? String
+                
+                self.posts[2] = temp1!
+                self.tableView1.reloadData()
             }
             else{
-                
+//               self.posts.insert("Add Something!", at: 2)
             }
      
         }
+        
+//        dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_3").observe(.value){
+//            (snap: FIRDataSnapshot) in
+//            if snap.exists() == true
+//            {
+//                let temp1 = snap.value as? String
+//               // self.posts.remove(at: 3)
+//                self.posts.insert(temp1!, at: 3)
+//                self.tableView1.reloadData()
+//            }
+//            else{
+//                //self.posts.remove(at: 3)
+//            }
+//            
+//        }
+//        dataRef.child("artistProfiles").child(self.token).child("Price1").child("Price1_4").observe(.value){
+//            (snap: FIRDataSnapshot) in
+//            if snap.exists() == true
+//            {
+//                let temp1 = snap.value as? String
+//               // self.posts.remove(at: 4)
+//                self.posts.insert(temp1!, at: 4)
+//                self.tableView1.reloadData()
+//            }
+//            else{
+//               // self.posts.remove(at: 4)
+//            }
+//            
+//        }
+        
+        
+//
+//        dataRef.child("artistProfiles").child(self.token).child("Price1").queryOrderedByKey().observe(.childAdded, with: { (snapshot) in
+//            //
+//            
+//                 
+//                    if snapshot.exists() == true{
+//                        
+//                        let snapshotValue = snapshot.value as? NSDictionary
+//                        let name = snapshotValue?["Price1_\(self.uploadCount)"] as? String
+//                
+//                        self.posts.insert(name, at: self.uploadCount)
+//                        
+//                        print("\(self.posts) okay man" )
+//                        self.uploadCount = self.uploadCount + 1
+//                    }
+//                    else{
+//                        self.uploadVar = false
+//                    }
+//
+//            
+//            })
         
         //Table2
         
         dataRef.child("artistProfiles").child(self.token).child("Price2").child("Price2_0").observe(.value){
             (snap: FIRDataSnapshot) in
-            var temp4: String!
-            temp4 = snap.value as? String
-            if temp4 != nil
+            if snap.exists() == true
             {
-                self.posts2[0] = temp4!
+                let temp1 = snap.value as? String
+                 self.posts2[0] = temp1!
                 self.tableView2.reloadData()
             }
             else{
-                
+//                self.posts2.insert("Add Something!", at: 0)
             }
         }
+        
+        
         dataRef.child("artistProfiles").child(self.token).child("Price2").child("Price2_1").observe(.value){
             (snap: FIRDataSnapshot) in
-            var temp5: String!
-            temp5 = snap.value as? String
-            if temp5 != nil
+            if snap.exists() == true
             {
-                self.posts2[1] = temp5!
+                let temp1 = snap.value as? String
+                
+                 self.posts2[1] = temp1!
                 self.tableView2.reloadData()
             }
             else{
-                
+//                self.posts2.insert("Add Something!", at: 1)
             }
         }
         
         
         dataRef.child("artistProfiles").child(self.token).child("Price2").child("Price2_2").observe(.value){
             (snap: FIRDataSnapshot) in
-            var temp6: String!
-            temp6 = snap.value as? String
-            if temp6 != nil
+            if snap.exists() == true
             {
-                self.posts2[2] = temp6!
+                let temp1 = snap.value as? String
+                
+                 self.posts2[2] = temp1!
                 self.tableView2.reloadData()
             }
             else{
-                
+//                self.posts2.insert("Add Something!", at: 2)
             }
             
         }
         
+//        dataRef.child("artistProfiles").child(self.token).child("Price2").child("Price2_3").observe(.value){
+//            (snap: FIRDataSnapshot) in
+//            if snap.exists() == true
+//            {
+//                let temp1 = snap.value as? String
+//              
+//                self.posts2.insert(temp1!, at: 3)
+//                self.tableView2.reloadData()
+//            }
+//           
+//            
+//        }
+//        dataRef.child("artistProfiles").child(self.token).child("Price2").child("Price2_4").observe(.value){
+//            (snap: FIRDataSnapshot) in
+//            if snap.exists() == true
+//            {
+//                let temp1 = snap.value as? String
+//        
+//                self.posts2.insert(temp1!, at: 4)
+//                self.tableView2.reloadData()
+//            }
+//          
+//            
+//        }
+//        
+       
+        
+        
+        
         
 
         
-        //print(posts)
+        
 
     }
     func SetPic()
@@ -842,14 +1080,14 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
                         let url = URL(string: profileImageURL)
                         URLSession.shared.dataTask(with: url!, completionHandler: { (data, response, error) in
                             if error != nil{
-                                print(error!)
+                                //print(error!)
                                 return
                             }
                             DispatchQueue.main.async {
-                                print(data!)
+                               // print(data!)
                                 if data == nil
                                 {
-                                    print("nil")
+                                    //print("nil")
                                     
                                 }
                                 else
@@ -879,14 +1117,14 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
                         let url = URL(string: profileImageURL)
                         URLSession.shared.dataTask(with: url!, completionHandler: { (data, response, error) in
                             if error != nil{
-                                print(error!)
+                                //print(error!)
                                 return
                             }
                             DispatchQueue.main.async {
-                                print(data!)
+                               // print(data!)
                                 if data == nil
                                 {
-                                    print("nil")
+                                   // print("nil")
                                     
                                 }
                                 else
@@ -918,14 +1156,14 @@ class ArtistViewController: UIViewController, UITextViewDelegate, UIPickerViewDe
                         let url = URL(string: profileImageURL)
                         URLSession.shared.dataTask(with: url!, completionHandler: { (data, response, error) in
                             if error != nil{
-                                print(error!)
+                               // print(error!)
                                 return
                             }
                             DispatchQueue.main.async {
-                                print(data!)
+                               // print(data!)
                                 if data == nil
                                 {
-                                    print("nil")
+                                 //   print("nil")
                                     
                                 }
                                 else
