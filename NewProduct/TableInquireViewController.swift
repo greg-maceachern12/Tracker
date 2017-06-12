@@ -16,6 +16,7 @@ struct inquireStuct {
     let name: String!
     let theme: String!
     let code: String!
+    let token: String!
 }
 
 class TableInquireViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
@@ -69,12 +70,14 @@ class TableInquireViewController: UIViewController, UITableViewDelegate, UITable
         
         let cellNumber = indexPath.row
         let cellID = inqposts[cellNumber].code
+        let userID = inqposts[cellNumber].token
         
         print(cellID!)
     
         let myVC = storyboard?.instantiateViewController(withIdentifier: "Inquire") as! inquireViewController
         
         myVC.code = cellID!
+        myVC.token = userID!
         
         //            print(myVC.token)
         self.present(myVC, animated: true)
@@ -102,10 +105,13 @@ class TableInquireViewController: UIViewController, UITableViewDelegate, UITable
                 let snapshotValueCode = snapshot.value as? NSDictionary
                 let Code = snapshotValueCode?["code"] as? String
                 
+                let snapshotValueToken = snapshot.value as? NSDictionary
+                let Token = snapshotValueToken?["token"] as? String
                 
                 
                 
-                self.inqposts.insert(inquireStuct(name: Name, theme: Theme, code: Code), at: 0)
+                
+                self.inqposts.insert(inquireStuct(name: Name, theme: Theme, code: Code, token: Token), at: 0)
                 
                 //print(self.inqposts)
                 self.homeTab.reloadData()

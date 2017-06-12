@@ -25,6 +25,7 @@ class BookingViewController: UIViewController, UITableViewDelegate,UITableViewDa
     @IBOutlet weak var dateWheelEnd: UIDatePicker!
     @IBOutlet weak var tvNotes: UITextView!
     @IBOutlet weak var tbTheme: UITextField!
+    @IBOutlet weak var scroller: UIScrollView!
 
     var placeholderLabel: UILabel!
     
@@ -61,6 +62,7 @@ class BookingViewController: UIViewController, UITableViewDelegate,UITableViewDa
         
         tbTheme.delegate = self
         tvNotes.delegate = self
+        scroller.delegate = self
         
         SetUp()
 
@@ -72,6 +74,8 @@ class BookingViewController: UIViewController, UITableViewDelegate,UITableViewDa
         // Dispose of any resources that can be recreated.
     }
     
+    /////////////////////////////////////////////////////////////////
+                        //Code for the textfields and textviews
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         view.endEditing(true)
     }
@@ -79,6 +83,12 @@ class BookingViewController: UIViewController, UITableViewDelegate,UITableViewDa
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         tbTheme.resignFirstResponder()
         return true
+    }
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        tbTheme.becomeFirstResponder()
+    }
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        tvNotes.becomeFirstResponder()
     }
     
     func textViewDidEndEditing(_ textView: UITextView) {
@@ -89,6 +99,11 @@ class BookingViewController: UIViewController, UITableViewDelegate,UITableViewDa
         placeholderLabel.isHidden = !tvNotes.text.isEmpty
     }
 
+    
+    
+    ////////////////////////////////////////////////////////////
+    
+    
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         cell.backgroundColor = UIColor.clear
     }
@@ -195,7 +210,7 @@ class BookingViewController: UIViewController, UITableViewDelegate,UITableViewDa
             self.userName = snap.value as? String
         }
         
-        dataRef.child("artistProfiles").child(self.userID).child("Email").observe(.value){
+        dataRef.child("artistProfiles").child(self.loggedUser!.uid).child("Email").observe(.value){
             (snap: FIRDataSnapshot) in
             if snap.exists() == true{
             self.email = snap.value as! String
@@ -461,7 +476,8 @@ class BookingViewController: UIViewController, UITableViewDelegate,UITableViewDa
                                                      "Pricing Option": self.pricingOption as AnyObject,
                                                      "Extra Notes": self.tvNotes.text as AnyObject,
                                                      "code": accessCode as AnyObject,
-                                                     "Theme": self.tbTheme.text as AnyObject]
+                                                     "Theme": self.tbTheme.text as AnyObject,
+                                                     "token": self.loggedUser!.uid as AnyObject]
    
             self.dataRef.child("artistProfiles").child(self.userID).child("Inquires").child(accessCode).setValue(inquirePost)
             
