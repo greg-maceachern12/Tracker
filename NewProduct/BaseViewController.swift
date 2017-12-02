@@ -45,37 +45,37 @@ class BaseViewController: UIViewController, SlideMenuDelegate {
         case 0:
             print("Artist", terminator: "")
 
-            let myVC = storyboard?.instantiateViewController(withIdentifier: "Artist") as! ArtistViewController
-            if artistCreate == true{
-            myVC.token = self.loggedUser?.uid
-            present(myVC, animated: true)
-            }
-            else
-            {
-                let alertContoller = UIAlertController(title: "Oops!", message: "You haven't created an Artist Profile yet! Make one on your home page", preferredStyle: .alert)
-                
-                let defaultAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
-                alertContoller.addAction(defaultAction)
-                self.present(alertContoller, animated:true, completion: nil)
-            }
+//            let myVC = storyboard?.instantiateViewController(withIdentifier: "Artist") as! ArtistViewController
+//            if artistCreate == true{
+//            myVC.token = self.loggedUser?.uid
+//            present(myVC, animated: true)
+//            }
+//            else
+//            {
+//                let alertContoller = UIAlertController(title: "Oops!", message: "You haven't created an Artist Profile yet! Make one on your home page", preferredStyle: .alert)
+//                
+//                let defaultAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+//                alertContoller.addAction(defaultAction)
+//                self.present(alertContoller, animated:true, completion: nil)
+//            }
             
             
             break
         case 1:
             print("Play\n", terminator: "")
-            
-            let myVC = storyboard?.instantiateViewController(withIdentifier: "TableInquire") as! TableInquireViewController
-            if artistCreate == true{
-                present(myVC, animated: true)
-            }
-            else
-            {
-                let alertContoller = UIAlertController(title: "Oops!", message: "You have no inquires! You haven't created an Artist Profile yet! Make one on your home page", preferredStyle: .alert)
-                
-                let defaultAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
-                alertContoller.addAction(defaultAction)
-                self.present(alertContoller, animated:true, completion: nil)
-            }
+//            
+//            let myVC = storyboard?.instantiateViewController(withIdentifier: "TableInquire") as! TableInquireViewController
+//            if artistCreate == true{
+//                present(myVC, animated: true)
+//            }
+//            else
+//            {
+//                let alertContoller = UIAlertController(title: "Oops!", message: "You have no inquires! You haven't created an Artist Profile yet! Make one on your home page", preferredStyle: .alert)
+//                
+//                let defaultAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+//                alertContoller.addAction(defaultAction)
+//                self.present(alertContoller, animated:true, completion: nil)
+//            }
 
            
             break

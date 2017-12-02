@@ -31,15 +31,16 @@ override func viewDidLoad() {
     tbUser.delegate = self
     tbPassword.delegate = self
     
-    btnCreate.layer.cornerRadius = 5
-    btnLogin.layer.cornerRadius = 5
+    btnCreate.layer.cornerRadius = btnCreate.frame.width/2
     
+    btnLogin.layer.cornerRadius = btnLogin.frame.width/2
+        
     btnLogout.isEnabled = false
     
     //if there is a user logged in
     if let user = FIRAuth.auth()?.currentUser
     {
-        self.Show()
+        
        self.btnLogout.alpha = 1.0
        self.btnLogout.isEnabled = true
        self.tbUser.text = user.email
@@ -237,9 +238,20 @@ override func viewDidLoad() {
     {
         let storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
         
-        let vc: UIViewController = storyboard.instantiateViewController(withIdentifier: "Home")
+        let vc: UITabBarController = storyboard.instantiateViewController(withIdentifier: "Start") as! UITabBarController
         
         self.present(vc, animated: true, completion: nil)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(true)
+        if FIRAuth.auth()?.currentUser != nil {
+            let storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+            
+            let vc: UIViewController = storyboard.instantiateViewController(withIdentifier: "Start")
+            
+            self.present(vc, animated: true, completion: nil)
+        }
     }
 }
 

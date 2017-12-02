@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12120" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="01J-lp-oVM">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12088"/>
-        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -22,16 +21,16 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Screen Shot 2017-05-21 at 4.20.39 PM" translatesAutoresizingMaskIntoConstraints="NO" id="q6Q-98-Mww">
-                                <rect key="frame" x="0.0" y="254" width="375" height="159"/>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="tr" translatesAutoresizingMaskIntoConstraints="NO" id="aRb-dq-Kka">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="q6Q-98-Mww" firstAttribute="width" secondItem="Ze5-6b-2t3" secondAttribute="width" id="6we-xN-kuo"/>
-                            <constraint firstItem="q6Q-98-Mww" firstAttribute="height" secondItem="Ze5-6b-2t3" secondAttribute="height" multiplier="0.2386" id="QkY-qx-c8f"/>
-                            <constraint firstItem="q6Q-98-Mww" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="a9X-WU-qNa"/>
-                            <constraint firstItem="q6Q-98-Mww" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="w6g-qy-Ksh"/>
+                            <constraint firstItem="aRb-dq-Kka" firstAttribute="width" secondItem="Ze5-6b-2t3" secondAttribute="width" id="01q-uf-hTq"/>
+                            <constraint firstItem="aRb-dq-Kka" firstAttribute="height" secondItem="Ze5-6b-2t3" secondAttribute="height" id="IfY-3E-4Ve"/>
+                            <constraint firstItem="aRb-dq-Kka" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="csz-DN-mYh"/>
+                            <constraint firstItem="aRb-dq-Kka" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="gWq-FI-PKM"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -41,6 +40,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Screen Shot 2017-05-21 at 4.20.39 PM" width="439" height="221"/>
+        <image name="tr" width="375" height="667"/>
     </resources>
 </document>

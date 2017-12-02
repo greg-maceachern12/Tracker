@@ -14,8 +14,15 @@ import FirebaseAuth
 import CoreLocation
 import Photos
 
+struct profileStruct{
+    let animalName: String!
+    let location: String!
+    let time: String!
+    let code: String!
+}
 
-class ViewController: UIViewController, UIImagePickerControllerDelegate,UINavigationControllerDelegate, UITextFieldDelegate, CLLocationManagerDelegate {
+
+class ViewController: UIViewController, UIImagePickerControllerDelegate,UINavigationControllerDelegate, UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource {
     
     @IBOutlet weak var lblName: UILabel!
     @IBOutlet weak var imgMain: UIImageView!
@@ -25,55 +32,63 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
     @IBOutlet var longpress: UILongPressGestureRecognizer!
     @IBOutlet weak var btnSave: UIButton!
     @IBOutlet var longLabel: UILongPressGestureRecognizer!
-    @IBOutlet weak var tbAbout: UITextField!
-    @IBOutlet weak var tabBar: UITabBarItem!
     @IBOutlet weak var lblEmail: UILabel!
-    
-    //declarations for about section
-    @IBOutlet weak var lblLoc: UILabel!
-    @IBOutlet weak var lblBirth: UILabel!
-    @IBOutlet weak var lblGend: UILabel!
-    @IBOutlet weak var lblID: UILabel!
-    @IBOutlet weak var btnEdit: UIButton!
-   
+    @IBOutlet weak var tblSight: UITableView!
     
     
-    let NameRef = FIRDatabase.database().reference()
+    
+    let dataRef = FIRDatabase.database().reference()
     let storageRef = FIRStorage.storage().reference()
+    let loggedUser = FIRAuth.auth()?.currentUser
     
     var upload = false
-    
-    var ableToSwitch = false
-    //giving these values of nothing
-    var loc = ""
-    var birth = ""
-    var gend = ""
-    var skills = ""
+    var coder: String!
+    var posts = [profileStruct]()
+ 
+    var cellID: String!
+    var cellCode: String!
     
     var email:String!
     
     var imagePicker = UIImagePickerController()
-    
-    var state = false
-    
-    var artistCreate = false
-    
+
     let user = FIRAuth.auth()?.currentUser
     
     //I was being lazy and made variables for these references
    let NameLoad = FIRDatabase.database().reference().child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("Name")
-    let aboutLoad = FIRDatabase.database().reference().child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("About")
-    
-    let manager = CLLocationManager()
+
     
 
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        manager.delegate = self
-        manager.desiredAccuracy = kCLLocationAccuracyBest
-        manager.requestWhenInUseAuthorization()
+        self.posts.removeAll()
+        
+       dataRef.child("users").child(self.loggedUser!.uid).child("Sightings").queryOrdered(byChild: "Time").observe(.childAdded, with: { (snapshot) in
+        
+        if snapshot.exists() == true{
+            let snapshotValueName = snapshot.value as? NSDictionary
+            let Name = snapshotValueName?["Name"] as? String
+            
+            let snapshotValuePrice = snapshot.value as? NSDictionary
+            let Location = snapshotValuePrice?["Location"] as? String
+            
+            let snapshotValueDate = snapshot.value as? NSDictionary
+            let TimeAgo = snapshotValueDate?["date"] as? String
+            
+            let snapshotValueCode = snapshot.value as? NSDictionary
+            let Code = snapshotValueCode?["code"] as? String
+            self.coder = Code
+            
+            
+            self.posts.insert(profileStruct(animalName: Name, location: Location, time: TimeAgo, code: Code), at: 0)
+        }
+        
+        self.tblSight.reloadData()
+        
+       })
+        
         
         
         lblName.isUserInteractionEnabled = true
@@ -94,22 +109,128 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         self.imgMain.isUserInteractionEnabled = true
        
     }
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        let location = locations[0]
-        NameRef.child("users").child(self.user!.uid).child("location(LL)").setValue("\(location.coordinate.latitude),\(location.coordinate.longitude)")
-        print(manager.location!)
-        if manager.location != nil
-        {
-            manager.stopUpdatingLocation()
-        }
     
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+       // cellNumber = indexPath.row
+        cellID = loggedUser!.uid
+        cellCode = posts[indexPath.row].code
+        
+        let myVC = storyboard?.instantiateViewController(withIdentifier: "animal") as! AnimalViewController
+        
+        myVC.token = cellID!
+        myVC.code = cellCode!
+        
+        //            print(myVC.token)
+        self.present(myVC, animated: true)
+    }
+    
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        //creates as many rows as there are posts
+        return posts.count
+    }
+    
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        
+        let delete = UITableViewRowAction(style: .destructive, title: "Delete") { action, index in
+            
+            let alertContoller = UIAlertController(title: "Confirm!", message: "Are You Sure You Want To Delete This Sighting?", preferredStyle: .alert)
+            
+            let defaultAction = UIAlertAction(title: "No", style: .cancel, handler: nil)
+            
+            let yesAction = UIAlertAction(title: "Yes", style: .default, handler: {
+                alert -> Void in
+                
+                let alertContoller2 = UIAlertController(title: "Success!", message: "You Successfully Deleted This Sighting", preferredStyle: .alert)
+                
+                let defaultAction2 = UIAlertAction(title: "Okay", style: .cancel, handler: nil)
+                alertContoller2.addAction(defaultAction2)
+                
+                self.dataRef.child("users").child(self.loggedUser!.uid).child("Sightings").child("\(self.loggedUser!.uid) - \(self.posts[indexPath.row].code!)").removeValue()
+                
+                self.dataRef.child("Sightings").child("\(self.loggedUser!.uid) - \(self.posts[indexPath.row].code!)").removeValue()
+                
+                self.posts.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: UITableViewRowAnimation.automatic)
+               
+                
+                
+                self.present(alertContoller2, animated:true, completion: nil)
+            
+            
+        })
+            
+            alertContoller.addAction(yesAction)
+            alertContoller.addAction(defaultAction)
+            
+            self.present(alertContoller, animated:true, completion: nil)
+        }
+        
+        
+        
+        
+        let edit = UITableViewRowAction(style: .normal, title: "Edit") { action, index in
+            
+            let myVC = self.storyboard?.instantiateViewController(withIdentifier: "Edit") as! EditViewController
+            
+        
+            myVC.code = self.posts[indexPath.row].code
+            
+            //            print(myVC.token)
+            self.present(myVC, animated: true)
+            
+            
+           
+            
+        }
+        
+       
+        
+        
+        
+        edit.backgroundColor = .blue
+        
+        
+        
+        return [edit, delete]
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        //creates a cell in the table and sets information based on the tag (Check tag in main.storyboard)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")
+        
+        
+        
+        let label1 = cell?.viewWithTag(1) as! UILabel
+        label1.text = posts[indexPath.row].animalName
+        
+        
+        let label2 = cell?.viewWithTag(2) as! UILabel
+        if let temp1 = posts[indexPath.row].location{
+            label2.text = temp1
+        }
+        
+        
+        let label3 = cell?.viewWithTag(3) as! UILabel
+        label3.text = posts[indexPath.row].time
+        
+        
+        return cell!
     }
 
+ 
 
-    //when save button is clicked
+
+    //when save button is clickedtab Bar
+    
     @IBAction func SaveChanges(_ sender: Any) {
         
-        self.manager.startUpdatingLocation()
         
        // saveChange()
         
@@ -119,97 +240,16 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         
         if upload == true{
             saveChange()
-            self.NameRef.child("users").child(self.user!.uid).child("Name").setValue(lblName.text)
+            self.dataRef.child("users").child(self.user!.uid).child("Name").setValue(lblName.text)
             //self.NameRef.child("artistProfiles").child(self.user!.uid).child("name").setValue(lblName.text)
-            if loc == ""{
-                
-            }
-            else{
-                self.NameRef.child("users").child(self.user!.uid).child("Location").setValue(loc)
-            }
-            
-            if birth == ""{
-            }
-            else{
-                self.NameRef.child("users").child(self.user!.uid).child("Birthday").setValue(birth)
-            }
-            if gend == ""{
-            }
-            else{
-            
-                self.NameRef.child("users").child(self.user!.uid).child("Gender").setValue(gend)
-            }
-            if skills == ""{
-            }
-            else
-            {
-                
-                self.NameRef.child("users").child(self.user!.uid).child("Skills").setValue(skills)
-            }
-            
-            
-            
-            if artistCreate == true
-            {
-                if skills == ""{
-                }
-                else
-                {
-                    
-                    self.NameRef.child("artistProfiles").child(self.user!.uid).child("Skills").setValue(skills)
-                }
-                self.NameRef.child("artistProfiles").child(self.user!.uid).child("Name").setValue(lblName.text)
-            }
-            
             upload = false
         }
         else{
-            self.NameRef.child("users").child(self.user!.uid).child("Name").setValue(lblName.text)
+            self.dataRef.child("users").child(self.user!.uid).child("Name").setValue(lblName.text)
            
             btnSave.isHidden=true
             
-            if loc == ""{
-                
-            }
-            else{
-            self.NameRef.child("users").child(self.user!.uid).child("Location").setValue(loc)
-            }
-            
-            if birth == ""{
-            }
-            else{
-            self.NameRef.child("users").child(self.user!.uid).child("Birthday").setValue(birth)
-            }
-            if gend == ""{
-            }
-            else{
-            self.NameRef.child("users").child(self.user!.uid).child("Gender").setValue(gend)
-            }
-            if skills == ""{
-            }
-            else
-            {
-                
-                self.NameRef.child("users").child(self.user!.uid).child("Skills").setValue(skills)
-            }
-            
-            
-                if artistCreate == true
-                {
-                    
-                    
-                    if skills == ""{
-                    }
-                    else
-                    {
-                        
-                        self.NameRef.child("artistProfiles").child(self.user!.uid).child("Skills").setValue(skills)
-                    }
-                    
-                   
-                    self.NameRef.child("artistProfiles").child(self.user!.uid).child("Name").setValue(lblName.text)
-                }
-        }
+                   }
     }
 
 
@@ -217,21 +257,8 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
     
                                                     //SETTING UP THE PROFILE
     func setupProfile(){
-        
-        self.NameRef.child("artistProfiles").child(self.user!.uid).child("token").observe(.value){
-            (snap: FIRDataSnapshot) in
-            if snap.exists() == true
-            {
-                self.artistCreate = true
-            }
-            else
-            {
-                self.artistCreate = false
-            }
-            
-        }
-    
-        imgMain.layer.cornerRadius = 4
+
+        imgMain.layer.cornerRadius = imgMain.frame.width/2
         imgMain.clipsToBounds = true
         
         btnSave.layer.cornerRadius = 5
@@ -242,7 +269,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         
         //loading image from database into view. Found this online. Not as efficient as I would have liked but it works
             let uid = FIRAuth.auth()?.currentUser?.uid
-            NameRef.child("users").child(uid!).observeSingleEvent(of: .value, with: {  (snapshot) in
+            dataRef.child("users").child(uid!).observeSingleEvent(of: .value, with: {  (snapshot) in
                 if let dict = snapshot.value as? [String: AnyObject]
                 {
             
@@ -265,7 +292,6 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
                             else
                             {
                             self.imgMain?.image = UIImage(data: data!)
-                            self.ableToSwitch = true
                             self.Loader.stopAnimating()
                             }
                             
@@ -291,16 +317,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             
         }
 
-        NameRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("Location").observe(.value){
-            (snap: FIRDataSnapshot) in
-            if let temp1 = snap.value as? String{
-                self.loc = temp1
-                self.lblLoc.text = "Location: \(temp1)"
-            }
-            
-        }
-        
-        NameRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("Email").observe(.value){
+        dataRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("Email").observe(.value){
             (snap: FIRDataSnapshot) in
             if let temp1 = snap.value as? String{
                 self.email = temp1
@@ -308,29 +325,7 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             }
             
         }
-        NameRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("Birthday").observe(.value){
-            (snap: FIRDataSnapshot) in
-            if let temp2 = snap.value as? String{
-                self.birth = temp2
-                self.lblBirth.text = "Birthday: \(temp2)"
-            }
-        }
-        NameRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("Gender").observe(.value){
-            (snap: FIRDataSnapshot) in
-            if let temp3 = snap.value as? String{
-                self.gend = temp3
-                self.lblGend.text = "Gender: \(temp3)"
-            }
-            
-        }
-        NameRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).child("Skills").observe(.value){
-            (snap: FIRDataSnapshot) in
-            if let temp4 = snap.value as? String{
-                self.skills = temp4
-                self.lblID.text = "Skills: \(temp4)"
-            }
-        }
-    
+        
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
@@ -398,29 +393,15 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
                         return
                     }
                     if let urlText = url?.absoluteString{
-                        self.NameRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).updateChildValues(["pic" : urlText], withCompletionBlock: { (error,ref) in
+                        self.dataRef.child("users").child((FIRAuth.auth()?.currentUser?.uid)!).updateChildValues(["pic" : urlText], withCompletionBlock: { (error,ref) in
                             if error != nil
                             {
                                 print(error!)
                                 return
                             }
                             self.Loader.stopAnimating()
-                            self.ableToSwitch = true
                             self.btnSave.isHidden = true
                         })
-                        if self.artistCreate == true
-                        {
-                        self.NameRef.child("artistProfiles").child((FIRAuth.auth()?.currentUser?.uid)!).updateChildValues(["pic" : urlText], withCompletionBlock: { (error,ref) in
-                            if error != nil
-                            {
-                                print(error!)
-                                return
-                            }
-                            self.Loader.stopAnimating()
-                            self.ableToSwitch = true
-                            self.btnSave.isHidden = true
-                        })
-                        }
                     }
                     })
                 })
@@ -476,7 +457,6 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
                 self.imagePicker.delegate = self
                 self.imagePicker.sourceType = UIImagePickerControllerSourceType.savedPhotosAlbum
                 self.imagePicker.allowsEditing = true
-                self.state = false
                 self.present(self.imagePicker, animated: true, completion: nil)
                 
             }
@@ -490,7 +470,6 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
                 self.imagePicker.delegate = self
                 self.imagePicker.sourceType = UIImagePickerControllerSourceType.camera
                 self.imagePicker.allowsEditing = true
-                self.state = false
                 self.present(self.imagePicker, animated: true, completion: nil)
                 
             }
@@ -563,173 +542,15 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
         
     }
     
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        tbAbout.resignFirstResponder()
-        return true
-    }
-   
-    @IBAction func tbEditBeing(_ sender: Any) {
-        btnSave.isHidden = false
-    }
+ 
     
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     
-    @IBAction func editClick(_ sender: Any) {
-        
-        
-        
-
-        
-       // This brings up the dialogue for changing the about field
-        let alertController = UIAlertController(title: "Edit Information", message: "", preferredStyle: .alert)
-        
-        let saveAction = UIAlertAction(title: "Save", style: .default, handler: {
-            alert -> Void in
-            
-            
-            
-            
-            let firstTextField = alertController.textFields![0] as UITextField
-             firstTextField.placeholder = "Please enter a location (City/State/Country)"
-            
-            if firstTextField.text == ""
-            {
-               
-            }
-            else
-            {
-                //print("firstName \(firstTextField.text)")
-                if let temp1 = firstTextField.text{
-                self.lblLoc.text = "Location: \(temp1)"
-                self.loc = temp1
-                self.btnSave.isHidden = false
-                    
-                }
-            }
-            
-            let secondTextField = alertController.textFields![1] as UITextField
-            secondTextField.placeholder = "Please enter a birthday(dd/mm/yy)"
-            if secondTextField.text == ""
-            {
-                
-            }
-            else
-            {
-                //print("firstName \(firstTextField.text)")
-                if let temp2 = secondTextField.text{
-                self.lblBirth.text = "Birthday: \(temp2)"
-                self.birth = temp2
-                self.btnSave.isHidden = false
-                }
-            }
-            
-            let thirdTextField = alertController.textFields![2] as UITextField
-            thirdTextField.placeholder = "Please enter a gender"
-            if thirdTextField.text == ""
-            {
-                
-            }
-            else
-            {
-                if let temp3 = thirdTextField.text{
-                
-                self.lblGend.text = "Gender: \(temp3)"
-                self.gend = temp3
-                self.btnSave.isHidden = false
-                }
-            }
-            
-            let fourthTextField = alertController.textFields![3] as UITextField
-            fourthTextField.placeholder = "Please enter some skills"
-            if fourthTextField.text == ""
-            {
-                
-            }
-            else
-            {
-                //print("firstName \(firstTextField.text)")
-                if let temp4 = fourthTextField.text{
-                self.lblID.text = "Skills: \(temp4)"
-                self.skills = temp4
-                self.btnSave.isHidden = false
-                }
-            }
-            
-        })
-        
-        let cancelAction = UIAlertAction(title: "Cancel", style: .default, handler: {
-            (action : UIAlertAction!) -> Void in
-            self.Loader.stopAnimating()
-            
-        })
-        
-        alertController.addTextField { (firstTextField : UITextField!) -> Void in
-            
-            if (self.lblLoc.text == "Location: Not Declared" || self.lblLoc.text == "Location:")
-            {
-            firstTextField.placeholder = "Please enter a location (City/State/Country)"
-            }
-            else
-            {
-                firstTextField.text = self.loc
-            }
-           
-        }
-        alertController.addTextField { (secondTextField : UITextField!) -> Void in
-            if (self.lblBirth.text == "Birthday: Not Declared" || self.lblBirth.text == "Birthday:")
-            {
-                secondTextField.placeholder = "Please enter a birthday (dd/mm/yyyy)"
-            }
-            else
-            {
-                secondTextField.text = self.birth
-            }
-            
-        }
-        alertController.addTextField { (thirdTextField : UITextField!) -> Void in
-            if (self.lblGend.text == "Gender: Not Declared" || self.lblGend.text == "Gender:")
-            {
-                thirdTextField.placeholder = "Please enter a gender"
-            }
-            else
-            {
-                thirdTextField.text = self.gend
-            }
-            
-        }
-        alertController.addTextField { (fourthTextField : UITextField!) -> Void in
-            if (self.lblID.text == "Skills: Not Declared" || self.lblID.text == "Skills:")
-            {
-                fourthTextField.placeholder = "Please enter your skills seperated by commas"
-            }
-            else
-            {
-                fourthTextField.text = self.skills
-            }
-            
-        }
-        
-        alertController.addAction(saveAction)
-        alertController.addAction(cancelAction)
-        
-        self.present(alertController, animated: true, completion: nil)
-        
-    }
-  
+    
     @IBAction func btnMoreAction(_ sender: Any) {
         
-        
-        var alertTitle: String!
-        if artistCreate == true
-            {
-                alertTitle = "View Artist Profile"
-            }
-            else
-            {
-                alertTitle = "Create Artist Profile"
-            }
-        
+
         let myActionSheet = UIAlertController(title: "Options", message: "Select", preferredStyle: UIAlertControllerStyle.actionSheet)
         
         
@@ -742,74 +563,15 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate,UINaviga
             
         }
         
-        let createArtist = UIAlertAction(title: alertTitle, style: UIAlertActionStyle.default) { (action) in
-            
-            
-                
-                if self.artistCreate == true
-                {
-                    
-
-
-                }
-                else{
-                    if self.skills == ""
-                    {
-                        let alertContoller = UIAlertController(title: "Oops!", message: "Add a set of skills to procede", preferredStyle: .alert)
-                        
-                        let defaultAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
-                        alertContoller.addAction(defaultAction)
-                        self.present(alertContoller, animated: true)
-                    }
-                    else{
-                    
-                    
-                    self.NameRef.child("artistProfiles").child(self.user!.uid).child("Name").setValue(self.lblName.text)
-                    
-                    self.NameRef.child("artistProfiles").child(self.user!.uid).child("token").setValue(self.user!.uid)
-                    
-                   
-                    self.NameRef.child("artistProfiles").child(self.user!.uid).child("skills").setValue(self.skills)
-                        
-                    self.NameRef.child("artistProfiles").child(self.user!.uid).child("Email").setValue(self.email)
-                    
-                    self.NameRef.child("users").child(self.user!.uid).child("pic").observe(.value){
-                        (snap: FIRDataSnapshot) in
-                        
-                        if snap.exists() == true
-                        {
-                            self.NameRef.child("artistProfiles").child(self.user!.uid).child("pic").setValue(snap.value as! String)
-                        }
-                        else{
-                            self.NameRef.child("artistProfiles").child(self.user!.uid).child("pic").setValue("default.ca")
-                        }
-                        let myVC = self.storyboard?.instantiateViewController(withIdentifier: "Artist") as! ArtistViewController
-                        
-                        myVC.token = self.user!.uid
-                        
-                        self.present(myVC, animated: true)
-                    }
-                    
-                }
-            }
-            
-               
-            
-
-            
-            
-            
-            
-            
-        }
-        
-        
-        
-        myActionSheet.addAction(createArtist)
         myActionSheet.addAction(Logout)
         myActionSheet.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.cancel, handler: nil))
         
         self.present(myActionSheet, animated: true, completion: nil)
+    }
+    
+    
+    @IBAction func refresh(_ sender: Any) {
+        self.viewDidLoad()
     }
     
     

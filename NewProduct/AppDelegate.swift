@@ -11,6 +11,7 @@ import Firebase
 import CoreData
 
 
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -25,12 +26,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
        
         
-        UINavigationBar.appearance().titleTextAttributes = [
-            NSFontAttributeName: UIFont(name: "Avenir Next", size: 15)!
-        ]
+//        UINavigationBar.appearance().titleTextAttributes = [
+//            NSFontAttributeName: UIFont(name: "Times", size: 15)!
+//        ]
+       
     
-        UITabBar.appearance().tintColor = UIColor(red: 253.0/255.0, green: 146.0/255.0, blue: 9.0/255.0, alpha: 1.0)
-        
+        UITabBar.appearance().tintColor = UIColor(red: 25.0/255.0, green: 69.0/255.0, blue: 179.0/255.0, alpha: 1.0)
 
         return true
     }
